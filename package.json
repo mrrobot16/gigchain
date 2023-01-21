@@ -1,0 +1,12 @@
+{
+    "name": "gigchain-contracts",
+    "author": "Hector Garcia",
+    "license": "MIT",
+    "version": "1.0.0",
+    "scripts": {
+        "lerna:bootstrap": "lerna bootstrap"
+    },
+    "devDependencies": {
+        "lerna": "^4.0.0"
+    }
+}
