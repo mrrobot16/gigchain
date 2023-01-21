@@ -4,7 +4,9 @@
     "license": "MIT",
     "version": "1.0.0",
     "scripts": {
-        "lerna:bootstrap": "lerna bootstrap"
+        "lerna:bootstrap": "lerna bootstrap",
+        "contracts:deploy": "cd packages/contracts && yarn deploy",
+        "contracts:test": "cd packages/contracts && yarn test"
     },
     "devDependencies": {
         "lerna": "^4.0.0"
