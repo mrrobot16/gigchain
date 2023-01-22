@@ -1,16 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
 
 contract Organization {
     address public owner;
     string public name;
     address[] public members;
     event Transfer(address indexed from, address indexed to, uint256 value);
+    event MultiTransfer(address indexed from, address[] indexed to, uint256[] value);
     event ReceiveEth(address indexed from, uint256 value);
+    event AddMember(address indexed member);
+    event RemoveMember(address indexed member);
+    error TransferFailed();
 
     receive() external payable {
-        console.log("Received Ether: %s", msg.value);
         emit ReceiveEth(msg.sender, msg.value);
     }
 
@@ -24,6 +27,7 @@ contract Organization {
     function addMember(address _member) public {
         require(msg.sender == owner, "Only the owner can add members");
         members.push(_member);
+        emit AddMember(_member);
     }
 
     function removeMember(address _member) public {
@@ -32,6 +36,7 @@ contract Organization {
             if (members[i] == _member) {
                 members[i] = members[members.length - 1];
                 members.pop();
+                emit RemoveMember(_member);
                 break;
             }
         }
@@ -54,38 +59,33 @@ contract Organization {
         return address(0);
     }
 
-    function payMember(address payable member) public payable {
+    function payMember(address payable _member, uint256 _amount) public payable {
+        uint256 balance = address(this).balance;     
         require(msg.sender == owner, "Only the owner can pay members");
-        require(msg.value > 0, "You must send some Ether");
-        require(msg.value <= address(this).balance, "You must send the correct amount of Ether");
-        require(getMember(member) != address(0), "Member does not exist");
-        bool sent = member.send(msg.value);
-        require(sent, "Failed to send Ether");
-        emit Transfer(msg.sender, member, msg.value);
+        require(_amount > 0, "You must send some Ether");
+        require(_amount <= balance, "You must send the correct amount of Ether");
+        require(getMember(_member) != address(0), "Member does not exist");
+        
+        if(_member.send(_amount)) {
+           emit Transfer(address(this), _member, _amount);
+        } else {
+            revert TransferFailed();
+        }
+        balance = address(this).balance;
     }
 
-    function getBalance() public view returns (uint) {
+    function payMembers(address[] memory _members, uint256[] memory _amounts) public {
+        require(msg.sender == owner, "Only the owner can pay members");
+        require(_members.length == _amounts.length, "You must send the correct amount of members and amounts");
+        for (uint i = 0; i < _members.length; i++) {
+            address member = _members[i];
+            payMember(payable(member), _amounts[i]);
+            emit Transfer(address(this), _members[i], _amounts[i]);
+        }
+        emit MultiTransfer(address(this), _members, _amounts);
+    }
+
+    function getBalance() public view returns (uint256) {
         return address(this).balance;
     }
-
-    function sendViaTransfer(address payable _to) external payable {
-        // This function is no longer recommended for sending Ether.
-        _to.transfer(msg.value);
-    }
-
-    function sendViaSend(address payable _to) public payable {
-        // Send returns a boolean value indicating success or failure.
-        // This function is not recommended for sending Ether.
-        bool sent = _to.send(msg.value);
-        require(sent, "Failed to send Ether");
-    }
-
-    function sendViaCall(address payable _to) public payable {
-        // Call returns a boolean value indicating success or failure.
-        // This is the current recommended method to use.
-        (bool sent, bytes memory data) = _to.call{value: msg.value}("");
-        console.log("data.length: %s", data.length);
-        require(sent, "Failed to send Ether");
-    }
-
 }
