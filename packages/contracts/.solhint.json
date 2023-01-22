@@ -2,6 +2,8 @@
     "extends": "solhint:recommended",
     "rules": {
       "compiler-version": ["error", "^0.8.17"],
-      "func-visibility": ["warn", { "ignoreConstructors": true }]
+      "func-visibility": ["warn", { "ignoreConstructors": true }],
+      "check-send-result": "warn",
+      "reason-string": "off"
     }
   }
