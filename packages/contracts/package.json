@@ -1,15 +1,17 @@
 {
   "name": "gigchain-contracts",
+  "private":"true",
   "scripts": {
     "help": "npx hardhat help",
     "test": "npx hardhat test",
     "test:gas": "REPORT_GAS=true npx hardhat test",
     "node": "npx hardhat node",
     "deploy": "yarn scripts:deploy:goerli",
+    "paymember": "yarn scripts:pay-member:goerli",
+    "paymembers": "yarn scripts:pay-members:goerli",
     "scripts:deploy:goerli": "npx hardhat run scripts/deploy.ts --network goerli",
-    "scripts:deploy-example:goerli": "npx hardhat run scripts/deploy-example.ts --network goerli",
-    "scripts:pay-members-example": "npx hardhat run scripts/pay-members-example.ts --network goerli",
-    "scripts:pay-members": "npx hardhat run scripts/pay-members.ts --network goerli",
+    "scripts:pay-member:goerli":"npx hardhat run scripts/pay-member.ts --network goerli",
+    "scripts:pay-members:goerli": "npx hardhat run scripts/pay-members.ts --network goerli",
     "compile": "npx hardhat compile",
     "hardhat:check": "npx hardhat check",
     "lint": "yarn lint:sol",
@@ -39,5 +41,11 @@
     "ethers": "^5.7.2",
     "hardhat-gas-reporter": "^1.0.9",
     "solidity-coverage": "^0.8.2"
+  },
+  "workspaces": {
+    "packages": [
+      "contracts",
+      "test"
+    ]
   }
 }
