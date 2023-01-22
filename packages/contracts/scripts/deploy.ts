@@ -3,10 +3,10 @@ import { ethers } from "hardhat";
 import { MEMBERS } from "../utils/constants";
 
 async function main() {
-  const depositAmount = ethers.utils.parseEther("0.0000000002000301");
+  const depositAmount = ethers.utils.parseEther("0.00016190");
 
   const Organization = await ethers.getContractFactory("Organization");
-  const organization = await Organization.deploy("MyOrganization", MEMBERS, { value: depositAmount});
+  const organization = await Organization.deploy("MyOrganizationDeployed", MEMBERS.slice(0, MEMBERS.length -1), { value: depositAmount});
 
   await organization.deployed();
   console.log("Organization deployed to:", organization.address);
