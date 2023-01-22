@@ -9,12 +9,10 @@ const {
   INFURA_ID, 
   GOERLI_PRIVATE_KEY,
   GOERLI_INFURA_URL,
+  MAINNET_PRIVATE_KEY,
+  MAINNET_INFURA_URL,
 } = process.env;
 
-// Make sure to have your own .env file with the following variables:
-// console.log("INFURA_ID", INFURA_ID);
-// console.log("GOERLI_PRIVATE_KEY", GOERLI_PRIVATE_KEY);
-// console.log("GOERLI_INFURA_URL", GOERLI_INFURA_URL);
 
 const url = `${GOERLI_INFURA_URL}${INFURA_ID}`;
 
@@ -24,6 +22,10 @@ const goerli = {
   url,
   accounts,
 }
+
+const networks = {
+  goerli,
+};
 
 const config: HardhatUserConfig = {
   solidity: {
