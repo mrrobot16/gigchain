@@ -1,7 +1,22 @@
 import { ethers } from "hardhat";
-export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
 
-const MEMBER_1 = "0x5Db06acd673531218B10430bA6dE9b69913Ad545"
+export const { HARDHAT_NETWORK } = process.env;
+
+const Network = HARDHAT_NETWORK || 'hardhat';
+
+export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000';
+
+export const ORGANIZATION_CONTRACT = 'Organization';
+export const ORGANIZATION_NAME_TEST = 'MyOrganization_TEST';
+export const ORGANIZATION_NAME = 'MyOrganization';
+export const ORGANIZATION_DEPOSIT = ethers.utils.parseEther("0.00016190");
+export const ORGANIZATION_DEPOSIT_TEST = ethers.utils.parseEther("10");
+export const ORGANIZATION_CONTRACT_FILE_PATH = `scripts/deployments/${Network}/organization.json`;
+// NOTE: This is the path to the file where the organization address is stored
+const organizationFilePath = `../../${ORGANIZATION_CONTRACT_FILE_PATH}`;
+export const ORGANIZATION_DATA_JSON = require(`../../${ORGANIZATION_CONTRACT_FILE_PATH}`);
+
+const MEMBER_1 = "0x5Db06acd673531218B10430bA6dE9b69913Ad545";
 const MEMBER_1_PAYMENT = ethers.utils.parseEther("1");
 const MEMBER_2 = "0x11bb17983E193A3cB0691505232331634B8FCa01";
 const MEMBER_2_PAYMENT = ethers.utils.parseEther("2");
@@ -14,9 +29,13 @@ export const MEMBERS = [
     MEMBER_3
 ];
 
+export const MEMBER = MEMBERS[0];
+export const PAY_MEMBER_AMOUNT = ethers.utils.parseEther("0.000001234567");
+
+
 export const NEW_MEMBER = "0x3D694A1C605e014b195FaA913e090e4BB9544FE3";
 export const NEW_MEMBER_PAYMENT = ethers.utils.parseEther("4");
-export const RANDOM_ADDRESS = "0xE36A62413F4eED447514cE9Ee3645dfb19f9b554";
+export const RANDOM_MEMBER_ADDRESS = "0xE36A62413F4eED447514cE9Ee3645dfb19f9b554";
 
 // NOTE: This is a bad practice, but it's just for testing purposes
 // NOTE: You should use a database or a file to store this data
