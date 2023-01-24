@@ -1,2 +1,2 @@
-import CreateOrganizationForm from 'components/CreateOrganizationForm';
+import CreateOrganizationForm from "components/CreateOrganizationForm";
 export { CreateOrganizationForm };
