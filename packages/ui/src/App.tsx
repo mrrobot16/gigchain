@@ -1,17 +1,16 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-
+import AppRouter from 'router';
+import CssBaseline from '@mui/material/CssBaseline';
+import { ThemeProvider } from '@mui/material/styles';
+import { MUItheme } from 'styles/theme';
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Welcome to Gigchain.
-        </p>
-      </header>
-    </div>
+    <>
+      <CssBaseline />
+      <ThemeProvider theme={MUItheme}>
+          <AppRouter />
+      </ThemeProvider>
+    </>
   );
 }
 
