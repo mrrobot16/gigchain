@@ -1,6 +1,6 @@
 {
   "organizationName": "MyOrganization",
   "network": "goerli",
-  "address": "0x4fC79ED3F7eB3B22D9d2817292018D09999d9991",
-  "etherscan_url": "https://goerli.etherscan.io/address/0x4fC79ED3F7eB3B22D9d2817292018D09999d9991"
+  "address": "0xe02B69235a00B7E249FB80bA05EE4564DF88cD0c",
+  "etherscanURL": "https://goerli.etherscan.io/address/0xe02B69235a00B7E249FB80bA05EE4564DF88cD0c"
 }

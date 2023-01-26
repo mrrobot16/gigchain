@@ -12,6 +12,7 @@ const {
     GOERLI_INFURA_URL,
     MAINNET_PRIVATE_KEY,
     MAINNET_INFURA_URL,
+    ETHERSCAN_API_KEY,
 } = process.env;
 
 const url = `${GOERLI_INFURA_URL}${INFURA_ID}`;
@@ -36,6 +37,9 @@ const config: HardhatUserConfig = {
     },
     networks: {
         goerli,
+    },
+    etherscan: {
+        apiKey: ETHERSCAN_API_KEY,
     },
 };
 
