@@ -1,1 +1,1 @@
-### Gigchain Monorepo
+### GigDAO Monorepo
