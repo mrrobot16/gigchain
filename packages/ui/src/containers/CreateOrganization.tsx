@@ -1,12 +1,19 @@
 import React from "react";
-import { Typography, Container, Box, TextField } from "@mui/material";
+import  { Container } from "@mui/material";
 
-import { CreateOrganizationForm } from "components";
+import { 
+  CreateOrganizationForm, 
+  // CreateOrganizationForm2,
+ } from "components";
 
 function CreateOrganization() {
   return (
-    <Container maxWidth="xl">
-      <CreateOrganizationForm />
+    <Container maxWidth="md">
+      {/* 
+      
+      <CreateOrganizationForm2 />
+      */}
+      <CreateOrganizationForm/>
     </Container>
   );
 }
