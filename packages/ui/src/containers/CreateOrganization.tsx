@@ -1,18 +1,18 @@
 import React from "react";
-import  { Container } from "@mui/material";
+import  { Container, Box, Typography } from "@mui/material";
 
 import { 
   CreateOrganizationForm, 
-  // CreateOrganizationForm2,
  } from "components";
 
 function CreateOrganization() {
   return (
     <Container maxWidth="md">
-      {/* 
-      
-      <CreateOrganizationForm2 />
-      */}
+      <Box>
+        <Typography variant="h1" component="h1" align="center">
+          Create an Organization
+        </Typography>
+      </Box>
       <CreateOrganizationForm/>
     </Container>
   );
