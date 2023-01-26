@@ -27,7 +27,7 @@ export class Web3 {
     const contract  = new ContractFactory(OrganizationABI.abi, OrganizationABI.bytecode, signer);
     const txConfig = {
       value: ethers.utils.parseEther(depositAmount.toString())
-    };    
+    };
     const deployedOrgContract = await contract.deploy(
       name, 
       members, 

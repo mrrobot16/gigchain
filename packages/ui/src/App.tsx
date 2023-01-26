@@ -9,7 +9,7 @@ import { createClient, configureChains, goerli } from 'wagmi'
 import { publicProvider } from 'wagmi/providers/public'
 import { infuraProvider } from 'wagmi/providers/infura'
 
-const { INFURA_API_KEY } = process.env;
+const { REACT_APP_INFURA_ID: INFURA_API_KEY } = process.env;
 const { chains, provider } = configureChains([goerli], [publicProvider(), infuraProvider({ apiKey: INFURA_API_KEY as string })])
  
 const client = createClient({
