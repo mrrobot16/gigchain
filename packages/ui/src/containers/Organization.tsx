@@ -1,12 +1,15 @@
 import React from "react";
+import  { Container, Box, Typography } from "@mui/material";
 
 function Organization() {
   return (
-    <>
-      <header className="App-header">
-        <p>Welcome to a Gigchain Organization.</p>
-      </header>
-    </>
+    <Container>
+      <Box>
+        <Typography variant="h1" component="h1" align="center">
+        Gigchain Organization Dashboard
+        </Typography>
+      </Box>
+    </Container>
   );
 }
 

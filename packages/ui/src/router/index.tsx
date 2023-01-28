@@ -8,6 +8,7 @@ function AppRouter() {
     <BrowserRouter>
       <Routes>
         <Route path="/organization/:address" element={<Organization />} />
+        <Route path="/org/:address" element={<Organization />} />
         <Route path="/" element={<CreateOrganization />} />
         <Route path="/create-organization" element={<CreateOrganization />} />
       </Routes>

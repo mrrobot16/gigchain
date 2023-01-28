@@ -1,6 +1,9 @@
 import React, { 
   useEffect 
 } from "react";
+import {
+  useNavigate
+} from "react-router-dom";
 import { 
   Box, 
   Button,
@@ -38,7 +41,7 @@ function CreateOrganizationForm() {
   const [name, setName] = React.useState<string>("");
   const [member, setMember ] = React.useState<Member>({ address: "0x5Db06acd673531218B10430bA6dE9b69913Ad545" });
   const [members, setMembers] = React.useState<Member[]>([]);
-
+  const navigate = useNavigate();
   const account = useAccount();
   const { data: signer, } = useSigner();
   const onChangeText = (textField: string, input: string) => {
@@ -97,11 +100,21 @@ function CreateOrganizationForm() {
     try {
       const web3 = await Web3.getInstance();
 
-      await web3.deployOrgContract(name, convertToArrayOfAddresses(members), signer as Signer);
+      await web3.deployOrgContract(
+        name, 
+        convertToArrayOfAddresses(members), 
+        signer as Signer, 
+        0.00018,
+        callbackAfterDeployOrgContract
+      );
 
     } catch (error: unknown) {
       throw new Error('Possible RPC Error: Metamask Tx Signature: User denied transaction signature');
     }
+  }
+
+  const callbackAfterDeployOrgContract = (address: string) => {
+    navigate(`/org/${address}`);
   }
 
   async function onSubmit() {
