@@ -22,7 +22,13 @@ export class Web3 {
     Web3.initialized = true;
   }
 
-  public async deployOrgContract(name: string, members: string[] | Member[], signer: Signer, depositAmount = 0.0001888) {
+  public async deployOrgContract(
+    name: string, 
+    members: string[] | Member[], 
+    signer: Signer, 
+    depositAmount = 0.0001888, 
+    callback?: (address: string) => void,
+  ) {
     console.log('Deploying Org Contract... please confirm transaction in MetaMask.');
     const contract  = new ContractFactory(OrganizationABI.abi, OrganizationABI.bytecode, signer);
     const txConfig = {
@@ -33,9 +39,14 @@ export class Web3 {
       members, 
       txConfig
     );
+
+    const deployedOrgContractAddress = deployedOrgContract.address
     console.log("Contract deployed successfully: ");
-    console.log("Contract address: ", deployedOrgContract.address);
+    console.log("Contract address: ", deployedOrgContractAddress);
+    // console.log('deployedOrgContract', deployedOrgContract);
+    
     const contractUrl = `https://${NETWORK}.etherscan.io/address/${deployedOrgContract.address}`;
     window.open(contractUrl, '_blank');
+    callback != undefined ? callback(deployedOrgContractAddress) : null;
   }
 }
