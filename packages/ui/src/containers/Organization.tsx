@@ -2,6 +2,7 @@ import React from "react";
 import  { Container, Box, Typography } from "@mui/material";
 
 function Organization() {
+  
   return (
     <Container>
       <Box>
