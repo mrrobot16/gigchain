@@ -45,30 +45,15 @@ function Organization() {
 
   const payMember = async (member: string, amount: BigNumber | number)  => {
     const web3 = await Web3.getInstance();
-    console.log('payMember', member);
-    console.log('payMember', amount);
-    console.log('payMember', signer);
-    
+    console.log('payMember member', member);
+    console.log('payMember amount', amount);
+    console.log('payMember signer', signer);
     await web3.payOrgMember(organization, member, amount, signer as Signer);
-    // const { data } = useContractWrite({
-    //   address: organization, 
-    //   abi: OrganizationABI.abi,
-    //   functionName: "payMember", 
-    //   args: [
-    //     member, 
-    //     utils.parseEther(amount.toString())
-    //   ]
-    // } as any);
-    // console.log('data', data);
-    
   }
 
   const payMembers = (members?: string[], amount?: (BigNumber[] | number[]))  => {
     console.log('payMembers members', members);
     console.log('payMembers amount', amount);
-    
-
-
   }
 
   const addMember = (member?: string)  => {

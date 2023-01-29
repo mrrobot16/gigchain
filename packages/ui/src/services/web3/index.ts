@@ -67,7 +67,6 @@ export class Web3 {
     console.log('contract', contract);
     
     const tx = await contract.payMember(member, amount, { gasLimit: 1000000 });
-    // console.log('tx', tx);
     
     return tx;
   }
