@@ -1,4 +1,4 @@
-import { Signer, ContractFactory, ethers } from 'ethers';
+import { Signer, ContractFactory, ethers, BigNumber } from 'ethers';
 import OrganizationABI from 'services/web3/abis/Organization.json';
 
 import { Member } from 'types';
@@ -14,7 +14,7 @@ export class Web3 {
       await instance.initialize();
       this._instance = instance;
       console.log('Web3 service instance has been initialized...');
-    }    
+    }
     return this._instance;
   }
 
@@ -48,5 +48,27 @@ export class Web3 {
     const contractUrl = `https://${NETWORK}.etherscan.io/address/${deployedOrgContract.address}`;
     window.open(contractUrl, '_blank');
     callback != undefined ? callback(deployedOrgContractAddress) : null;
+  }
+
+  public async getOrgMembers(orgContractAddress: string) {
+    console.log('Getting Org Members...');
+    
+    const contract = new ethers.Contract(orgContractAddress, OrganizationABI.abi);
+    const members = await contract.getMembers();
+    
+    return members;
+  }
+
+  public async payOrgMember(orgContractAddress: string, member: string, amount: BigNumber | number | string, signer: Signer) {
+    console.log(`Pay Org Member: ${member} amount: ${amount}`);
+
+    
+    const contract = new ethers.Contract(orgContractAddress, OrganizationABI.abi, signer);
+    console.log('contract', contract);
+    
+    const tx = await contract.payMember(member, amount, { gasLimit: 1000000 });
+    // console.log('tx', tx);
+    
+    return tx;
   }
 }
