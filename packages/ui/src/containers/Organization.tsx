@@ -1,16 +1,12 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import  { Container, Box, Typography, Button } from "@mui/material";
 
 import { useParams  } from "react-router-dom";
-import { BigNumber, utils, Signer } from "ethers";
-import { useContractRead, useContract, useSigner, useAccount } from "wagmi";
-// import { readContract } from "@wagmi/core"
+import { BigNumber } from "ethers";
 
 import { Web3 } from "services/web3";
 import { DashboardMemberList } from "components";
 import { Member } from "types";
-
-import OrganizationABI from "services/web3/abis/Organization.json";
 
 const buttonStyle = {
   width: "50%",
@@ -20,35 +16,31 @@ const buttonStyle = {
 function Organization() {
   const params = useParams();
   const organization = params.address as (`0x${string}`);
-  const { data: signer } = useSigner();
-  const config = { 
-    address: organization, 
-    abi: OrganizationABI.abi,
-  }
-  const contract = useContract(config);
-  const { data: orgMembers } = useContractRead({...config, functionName: "getMembers"});
-  const { data: orgBalance } = useContractRead({...config, functionName: "getBalance"});
-  const account = useAccount();
-  console.log('account', account);
+  const [orgMembers, setMembers] = useState<Member[] | undefined>([]);
+  const [orgBalance, setOrgBalance] = useState<BigNumber | undefined>(undefined);
   
-  const componentDidMount = async () => {
-    console.log('contract.getMembers', contract);
+  const componentDidMount = async (): Promise<void> => {
+    const web3 = await Web3.getInstance();
+    const getOrgMembers = await web3?.getOrgMembers(organization);
+    if (getOrgMembers != undefined) setMembers(getOrgMembers);
+    const getOrgBalance = await web3?.getOrgBalance(organization);
+    if (getOrgBalance != undefined) setOrgBalance(getOrgBalance);
   }
 
   useEffect(() => {
     componentDidMount();
+    console.log('members', orgMembers);
   }, []);
   
   const removeMember = (member: string | number)  => {
     console.log('removeMember', member);
   }
 
-  const payMember = async (member: string, amount: BigNumber | number)  => {
+  const payMember = async (member: string, amount: BigNumber | number)  => {    
     const web3 = await Web3.getInstance();
     console.log('payMember member', member);
     console.log('payMember amount', amount);
-    console.log('payMember signer', signer);
-    await web3.payOrgMember(organization, member, amount, signer as Signer);
+    await web3.payOrgMember(organization, member, amount);
   }
 
   const payMembers = (members?: string[], amount?: (BigNumber[] | number[]))  => {
@@ -76,7 +68,11 @@ function Organization() {
         </Typography>
         
         <DashboardMemberList 
-          members={orgMembers as Member[]} 
+          members={
+            typeof orgMembers != undefined ? 
+            orgMembers as Member[] : 
+            [] as Member[]
+          } 
           onRemoveMember={removeMember} 
           onPayMember={payMember} 
         />
