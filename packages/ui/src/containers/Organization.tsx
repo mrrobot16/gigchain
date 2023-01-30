@@ -29,7 +29,6 @@ function Organization() {
 
   useEffect(() => {
     componentDidMount();
-    console.log('members', orgMembers);
   }, []);
   
   const removeMember = (member: string | number)  => {
