@@ -104,7 +104,7 @@ function CreateOrganizationForm() {
         name, 
         convertToArrayOfAddresses(members), 
         signer as Signer, 
-        0.00018,
+        0.00018, // this should be a constant or user input
         callbackAfterDeployOrgContract
       );
 
