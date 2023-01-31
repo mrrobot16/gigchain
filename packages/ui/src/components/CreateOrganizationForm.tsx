@@ -12,13 +12,6 @@ import {
   FormLabel,
 } from "@mui/material";
 import { AddCircle as AddCircleIcon  } from '@mui/icons-material';
-import { Signer } from "ethers";
-import { 
-  useAccount, 
-  useSigner,
-} from "wagmi";
-import { connect } from '@wagmi/core'
-import { InjectedConnector } from '@wagmi/core/connectors/injected'
 
 import { Web3 } from "services/web3";
 import { Member } from "types"
@@ -42,8 +35,7 @@ function CreateOrganizationForm() {
   const [member, setMember ] = React.useState<Member>({ address: "0x5Db06acd673531218B10430bA6dE9b69913Ad545" });
   const [members, setMembers] = React.useState<Member[]>([]);
   const navigate = useNavigate();
-  const account = useAccount();
-  const { data: signer, } = useSigner();
+
   const onChangeText = (textField: string, input: string) => {
     switch (textField) {
       case "address":
@@ -72,7 +64,6 @@ function CreateOrganizationForm() {
     console.log("add member");
     console.log(member);
     setMembers([...members, member]);
-    // members.push(member);
   };
 
   const removeMember = (index: number) => {
@@ -82,32 +73,15 @@ function CreateOrganizationForm() {
     setMembers(newMembers);
   };
 
-  const connectWallet = async () => {
-    try {
-       const connection = await connect({
-        connector: new InjectedConnector(),
-      });
-      console.log('connectWallet() success');
-      console.log('connection', connection);
-      return connection.account.slice(0,2) == '0x' ? true : false;
-    } catch (error: unknown) {
-      console.log('connectWallet() error', error);
-      return false;
-    }
-  }
-
   const deployOrgContract = async () => {
     try {
       const web3 = await Web3.getInstance();
-
       await web3.deployOrgContract(
         name, 
         convertToArrayOfAddresses(members), 
-        signer as Signer, 
         0.00018, // this should be a constant or user input
         callbackAfterDeployOrgContract
       );
-
     } catch (error: unknown) {
       throw new Error('Possible RPC Error: Metamask Tx Signature: User denied transaction signature');
     }
@@ -118,23 +92,7 @@ function CreateOrganizationForm() {
   }
 
   async function onSubmit() {
-    console.log(account);
-    if (account.isConnected) {
-      console.log('Account is connected and attempting deploying org contract...');
-      deployOrgContract()
-    }
-    else {
-      console.log('Account not connected');
-      const connected = await connectWallet();
-      console.log('second attempt to connect...');
-      if (connected) {
-        console.log('Account now connected and attempting to deploy org contract...');
-        deployOrgContract()
-      }
-      else {
-        throw new Error('account does not connect and contract not deployed');
-      }
-    }
+    deployOrgContract()
   }
 
   const componentDidMount = () => {
