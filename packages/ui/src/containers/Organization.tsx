@@ -16,7 +16,7 @@ const buttonStyle = {
 function Organization() {
   const params = useParams();
   const organization = params.address as (`0x${string}`);
-  const [orgMembers, setMembers] = useState<Member[] | undefined>([]);
+  const [orgMembers, setMembers] = useState<Member[] | string[]>([]);
   const [orgBalance, setOrgBalance] = useState<BigNumber | undefined>(undefined);
   
   const componentDidMount = async (): Promise<void> => {
@@ -69,7 +69,7 @@ function Organization() {
         <DashboardMemberList 
           members={
             typeof orgMembers != undefined ? 
-            orgMembers as Member[] : 
+            orgMembers : 
             [] as Member[]
           } 
           onRemoveMember={removeMember} 
