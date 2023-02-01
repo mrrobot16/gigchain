@@ -104,10 +104,24 @@ export class Web3 {
     return tx;
   }
 
-  public async payOrgMembers(orgContractAddress: string, members: string[], amounts: BigNumber[] | number[] | string[] | undefined) {
+  public async payOrgMembers(orgContractAddress: string, members: string[] | Member[], amounts: BigNumber[] | number[] | string[] | undefined) {
     console.log(`Pay Org Members: ${members} amount: ${amounts}`);
     const contract = new ethers.Contract(orgContractAddress, OrganizationABI.abi, this.signer);
     const tx = await contract.payMembers(members, amounts, { gasLimit: 1000000 });
+    return tx;
+  }
+
+  public async addOrgMember(orgContractAddress: string, member: string) {
+    console.log(`Add Org Member: ${member}`);
+    const contract = new ethers.Contract(orgContractAddress, OrganizationABI.abi, this.signer);
+    const tx = await contract.addMember(member, { gasLimit: 1000000 });
+    return tx;
+  }
+
+  public async removeOrgMember(orgContractAddress: string, member: string) {
+    console.log(`Remove Org Member: ${member}`);
+    const contract = new ethers.Contract(orgContractAddress, OrganizationABI.abi, this.signer);
+    const tx = await contract.removeMember(member, { gasLimit: 1000000 });
     return tx;
   }
 }
