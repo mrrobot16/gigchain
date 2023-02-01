@@ -42,9 +42,11 @@ function Organization() {
     await web3.payOrgMember(organization, member, amount);
   }
 
-  const payMembers = (members?: string[], amount?: (BigNumber[] | number[]))  => {
+  const payMembers = async (members?: string[], amount?: (BigNumber[] | number[]))  => {
     console.log('payMembers members', members);
     console.log('payMembers amount', amount);
+    const web3 = await Web3.getInstance();
+    await web3.payOrgMembers(organization, orgMembers, amount);
   }
 
   const addMember = (member?: string)  => {
