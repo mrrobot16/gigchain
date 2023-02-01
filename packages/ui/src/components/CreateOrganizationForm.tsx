@@ -24,22 +24,22 @@ const formStyle = {
 }
 
 const mockMembers: Member[] = [
-  { address: "0x5Db06acd673531218B10430bA6dE9b69913Ad545" },
-  { address: "0x11bb17983E193A3cB0691505232331634B8FCa01" },
+  { address: "0x5Db06acd673531218B10430bA6dE9b69913Ad545", amount: 0.00018 },
+  { address: "0x11bb17983E193A3cB0691505232331634B8FCa01", amount: 0.00018 },
 ]
 
 const { REACT_APP_ENVIRONMENT: APP_ENV } = process.env;
 
 function CreateOrganizationForm() {
   const [name, setName] = React.useState<string>("");
-  const [member, setMember ] = React.useState<Member>({ address: "0x5Db06acd673531218B10430bA6dE9b69913Ad545" });
+  const [member, setMember ] = React.useState<Member>({ address: "0x5Db06acd673531218B10430bA6dE9b69913Ad545", amount: 0.00018 });
   const [members, setMembers] = React.useState<Member[]>([]);
   const navigate = useNavigate();
 
   const onChangeText = (textField: string, input: string) => {
     switch (textField) {
       case "address":
-        setMember({ address: input });
+        setMember({ address: input, amount: '' });
       break;
       case "name":
         setName(input);
@@ -98,7 +98,7 @@ function CreateOrganizationForm() {
   const componentDidMount = () => {
     if(APP_ENV === "development") {
       setName("TestUiOrg");
-      setMember({ address: "0x3D694A1C605e014b195FaA913e090e4BB9544FE3" });
+      setMember({ address: "0x3D694A1C605e014b195FaA913e090e4BB9544FE3", amount: 0.00018 });
       setMembers(mockMembers);
     }
   }

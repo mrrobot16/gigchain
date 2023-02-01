@@ -19,7 +19,6 @@ interface DashboardMemberListProps {
 }
 
 export const DashboardMemberList = ({members, onRemoveMember, onPayMember}: DashboardMemberListProps) => {
-  // const [amount, setAmount] = React.useState(0);
   return (
     <List>
       <Typography variant="h5" align="center">
@@ -34,6 +33,13 @@ export const DashboardMemberList = ({members, onRemoveMember, onPayMember}: Dash
               <ListItemText primary={typeof item == "string" ? item.slice(0,20) : item.address} />
               <TextField inputProps={{ inputMode: 'numeric' }} type="number" onChange={(event)=>{
                 setAmount(parseInt(event.target.value));
+                // This useState should come from parent component
+                // setMembersList([
+                //   ...membersList, {
+                //     amount: parseInt(event.target.value),
+                //     address: typeof item == "string" ? item : item.address,
+                //   }
+                //   ]);
               }}/>
               <ListItemIcon onClick={()=>{
                 // console.log('amount', amount);
