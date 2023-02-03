@@ -7,6 +7,10 @@ import { BigNumber } from "ethers";
 import { Web3 } from "services/web3";
 import { DashboardMemberList } from "components";
 import { Member } from "types";
+import { 
+  convertToArrayOfAddresses,
+  convertToArrayOfAmounts, 
+} from "utils";
 
 const buttonStyle = {
   width: "50%",
@@ -18,6 +22,7 @@ function Organization() {
   const organization = params.address as (`0x${string}`);
   const [orgMembers, setMembers] = useState<Member[] | string[]>([]);
   const [orgBalance, setOrgBalance] = useState<BigNumber | undefined>(undefined);
+  const [membersToPay, setMembersToPay] = useState<Member[]>([]);
   
   const componentDidMount = async (): Promise<void> => {
     const web3 = await Web3.getInstance();
@@ -42,11 +47,15 @@ function Organization() {
     await web3.payOrgMember(organization, member, amount);
   }
 
-  const payMembers = async (members?: string[], amount?: (BigNumber[] | number[]))  => {
-    console.log('payMembers members', members);
-    console.log('payMembers amount', amount);
+  const payMembers = async ()  => {
+    // PayMembers expect an array of addresses and an array of amounts.
+    const PAYROLL = {
+      members: convertToArrayOfAddresses(membersToPay),
+      amounts: convertToArrayOfAmounts(membersToPay),
+    }
+    console.log('PAYROLL', PAYROLL);
     const web3 = await Web3.getInstance();
-    await web3.payOrgMembers(organization, orgMembers, amount);
+    await web3.payOrgMembers(organization, PAYROLL.members, PAYROLL.amounts);
   }
 
   const addMember = (member?: string)  => {
@@ -75,7 +84,9 @@ function Organization() {
             [] as Member[]
           } 
           onRemoveMember={removeMember} 
-          onPayMember={payMember} 
+          onPayMember={payMember}
+          setMembersToPay={setMembersToPay}
+          membersToPay={membersToPay}
         />
 
         <div>
