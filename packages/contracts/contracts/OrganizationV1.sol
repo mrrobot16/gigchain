@@ -2,12 +2,27 @@
 pragma solidity ^0.8.17;
 // import "hardhat/console.sol";
 
+struct Member {
+    address account;
+    uint256 balance;
+    bool exists;
+    // bool active; // This could be useful to check if a member is active or not to determine if should be paid.
+}
+
+struct Payment { 
+    address payable to;
+    uint256 amount;
+}
+
 contract OrganizationV1 {
     address public owner;
     string public name;
-    address[] public members;
-    event Transfer(address indexed from, address indexed to, uint256 value);
+    address public controller;
+    mapping(address => Member) public membersV1;
+    uint256 public memberCount;
+    event AddMemberV1(address indexed member);
     event MultiTransfer(address indexed from, address[] indexed to, uint256[] value);
+    event Transfer(address indexed from, address indexed to, uint256 value);
     event ReceiveEth(address indexed from, uint256 value);
     event AddMember(address indexed member);
     event RemoveMember(address indexed member);
@@ -20,74 +35,99 @@ contract OrganizationV1 {
     constructor(string memory _name, address[] memory _members) payable {
         owner = msg.sender;
         name = _name;
-        members = _members;
-        addMember(owner);
+        controller = msg.sender;
+        addMembersV1(_members);
+        // For now we always want the signer to be a member and the owner of an Organization.
+        addMemberV1(owner);
     }
 
-    function addMember(address _member) public onlyOwner("addMember") {
-        members.push(_member);
-        emit AddMember(_member);
+    function addMemberV1(address account) public onlyController("addMemberV2") {
+        require(!membersV1[account].exists, "Member already exists");
+        Member memory member = Member(account, 0, true, true);
+        membersV1[account] = member;
+        memberCount++;
+        emit AddMemberV1(membersV1[account].account);
     }
 
-    function removeMember(address _member) public onlyOwner("removeMember") {
-        for (uint i = 0; i < members.length; i++) {
-            if (members[i] == _member) {
-                members[i] = members[members.length - 1];
-                members.pop();
-                emit RemoveMember(_member);
-                break;
-            }
+    function addMembersV1(address[] memory _members) public onlyController("addMembers") {
+        for (uint i = 0; i < _members.length; i++) {
+            addMemberV1(_members[i]);
+            emit AddMemberV1(membersV1[_members[i]].account);
         }
     }
 
-    function payMember(address payable _member, uint256 _amount)
-        public payable
-        onlyOwner("payMember") 
-        correctAmount(_amount)
-        memberMustExist(_member)  
-        mustSendEther(_amount)
+    function removeMemberV1(address _member) public onlyController("removeMember") memberMustExist(_member) {
+        delete(membersV1[_member]);
+    }
+
+    function getMemberV1(address account) public view returns (Member memory) {
+        if(membersV1[account].account == account) {
+            return membersV1[account];
+        }
+        return Member(address(0), 0, false, false);
+    }
+
+    function getMemberCount() public view returns (uint256) {
+        return memberCount;
+    }
+
+    function payMember(Payment calldata payment) 
+        public payable 
+        onlyController("payMemberV1")
+        memberMustExist(payment.to)
+        organizationHasFundsForPayment(payment.amount)
     {
-        uint256 balance = address(this).balance;     
-        if(_member.send(_amount)) {
-           emit Transfer(address(this), _member, _amount);
+        if(payment.to.send(payment.amount)) {
+            emit Transfer(address(this), payment.to, payment.amount);
         } else {
             revert TransferFailed();
         }
-        balance = address(this).balance;
     }
 
-    function payMembers(address[] memory _members, uint256[] memory _amounts) public onlyOwner("payMembers") {
-        // TODO: Need to refactor this to use array of objects with address and amount.
-        // TODO: Need to refactor this to use a mapping of address to amount.
-        require(_members.length == _amounts.length, "You must send the correct amount of members and amounts");
-        for (uint i = 0; i < _members.length; i++) {
-            address payable member = payable(_members[i]);
-            payMember(member, _amounts[i]);
-            emit Transfer(address(this), _members[i], _amounts[i]);
+    function payMembers(Payment[] calldata payments) 
+        public 
+        onlyController("payMembersV1")
+        organizationHasFundsForPayments(payments)
+    {
+        address[] memory payees;
+        uint256[] memory amounts;
+        for (uint i = 0; i < payments.length; i++) {
+            amounts[i] = payments[i].amount;
+            payees[i] = payments[i].to;
+            payMember(payments[i]);
         }
-    // TODO: Need to emit an event with the array of members and amounts.
-        emit MultiTransfer(address(this), _members, _amounts);
+        emit MultiTransfer(address(this), payees, amounts);
     }
 
-    function getMembers() public view returns (address[] memory) {
-        return members;
+    function transferControllership(address newController) public onlyController("transferControllership") {
+        controller = newController;
     }
 
-    function getMemberCount() public view returns (uint) {
-        return members.length;
+    modifier onlyController(string memory functionName) {
+        string memory message = string(abi.encodePacked("Only the controller can call: ", functionName));
+        require(msg.sender == controller, message);
+        _;
+    }
+    modifier memberMustExist(address _member) {
+        Member memory member = getMemberV1(_member);
+        require(member.account != address(0) && member.exists, "Member does not exist");
+        _;
     }
 
-    function getMember(address member) public view returns (address) {
-        for (uint i = 0; i < members.length; i++) {
-            if (members[i] == member) {
-                return members[i];
-            }
+    modifier organizationHasFundsForPayment(uint _amount) {
+        uint256 balance = address(this).balance;
+        require(_amount <= address(this).balance, "The amount payment should alway be less than balance");
+        _;
+    }
+
+    modifier organizationHasFundsForPayments(Payment[] memory payments) {
+        uint256 balance = address(this).balance;
+        uint256 total = 0;
+        for (uint i = 0; i < payments.length; i++) {
+            total += payments[i].amount;
         }
-        return address(0);
-    }
-
-    function getBalance() public view returns (uint256) {
-        return address(this).balance;
+        require(total <= balance, "The total payment amount should alway be less than balance");
+        _;
     }
 
     modifier onlyOwner(string memory functionName) {
@@ -95,30 +135,4 @@ contract OrganizationV1 {
         require(msg.sender == owner, message);
         _;
     }
-    
-    modifier memberMustExist(address _member) {
-        require(getMember(_member) != address(0), "Member does not exist");
-        _;
-    }
-
-    modifier mustSendEther(uint _amount) {
-        require(_amount > 0, "You must send some Ether");
-        _;
-    }
-
-    modifier correctAmount(uint _amount) {
-        uint256 balance = address(this).balance;
-        require(_amount <= balance, "You must send the correct amount of Ether");
-        _;
-    }
-
-    modifier correctAmounts(uint256[] memory _amounts) {
-        uint256 total = 0;
-        for (uint i = 0; i < _amounts.length; i++) {
-            total += _amounts[i];
-        }
-        require(total <= address(this).balance, "You must send the correct amount of Ether");
-        _;
-    }
-
 }
