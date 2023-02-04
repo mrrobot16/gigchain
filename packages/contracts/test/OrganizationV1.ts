@@ -14,7 +14,7 @@ import {
     ORGANIZATION_DEPOSIT_TEST,
 } from '../utils/constants';
 
-describe.only('Organization Contract V1', function () {
+describe('Organization Contract V1', function () {
     let OrganizationContract: ContractFactory;
     let organization: Contract;
     let organizationAddress: string;
@@ -41,7 +41,7 @@ describe.only('Organization Contract V1', function () {
                 gasLimit: 1000000 
             }
         );
-        // members = await organization.getMembers();
+        members = await organization.getMembers();
         organizationAddress = organization.address;
         console.log('Organization Address: ', organizationAddress);
         organizationName = await organization.name();
