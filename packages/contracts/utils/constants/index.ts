@@ -7,6 +7,7 @@ const Network = HARDHAT_NETWORK || 'hardhat';
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000';
 
 export const ORGANIZATION_CONTRACT = 'Organization';
+export const ORGANIZATION_CONTRACT_V1 = 'OrganizationV1';
 export const ORGANIZATION_NAME_TEST = 'MyOrganization_TEST';
 export const ORGANIZATION_NAME = 'MyOrganization';
 export const ORGANIZATION_DEPOSIT = ethers.utils.parseEther('0.00016190');
@@ -24,6 +25,7 @@ const MEMBER_3 = '0x44A814f80c14977481b47C613CD020df6ea3D25D';
 const MEMBER_3_PAYMENT = ethers.utils.parseEther('3');
 
 export const MEMBERS = [MEMBER_1, MEMBER_2, MEMBER_3];
+export const MEMBERS_V1 = [MEMBER_1, MEMBER_2, MEMBER_3];
 
 export const MEMBER = MEMBERS[0];
 export const PAY_MEMBER_AMOUNT = ethers.utils.parseEther('0.000001234567');
