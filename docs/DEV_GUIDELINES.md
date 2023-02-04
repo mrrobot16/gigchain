@@ -63,9 +63,9 @@ Title: Feature Circulating supply support
 Description: Circulating Supply contract is now supported
 dist folder is now being pushed to npm
 
-Closes: Issue URL: https://github.com/mrrobot16/gigchain/issues/1
+Closes: Issue URL: https://github.com/mrrobot16/gigchain/issues/5
 
-Link: PR URL: https://github.com/mrrobot16/gigchain/pull/1
+Link: PR URL: https://github.com/mrrobot16/gigchain/pull/4
 ```
 
 ### Example Issue and Pull Request
