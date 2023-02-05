@@ -120,10 +120,6 @@ contract OrganizationV2 {
             }
         }
         return membersArray;
-    } 
-    
-    function getMembers() public view returns (address[] memory) {
-        return membersAccountsV2;
     }
 
     function getMemberCountV2() public view returns (uint256) {
