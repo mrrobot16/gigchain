@@ -8,6 +8,10 @@ export interface Member {
 }
 
 export interface Payment {
-    amount: string | number | BigNumber;
+    amount: BigNumber;
     to: Member['account'];
+}
+
+export interface ErrorMessage {
+    message: string;
 }
