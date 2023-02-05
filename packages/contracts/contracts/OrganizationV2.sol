@@ -23,7 +23,7 @@ contract OrganizationV2 {
     uint256 public memberCount;
     mapping(address => Member) public membersV2;
     // mapping(uint => Payment) public payments;
-    Payment[] public memberPayments;
+    // Payment[] public memberPayments;
     event Transfer(address indexed from, address indexed to, uint256 value);
     event MultiTransfer(address indexed from, address[] indexed to, uint256[] value);
     event MultiTransferV2(address indexed from, address[] indexed to, uint256 value);
@@ -112,9 +112,7 @@ contract OrganizationV2 {
             revert NotEnoughEtherBalance();
         }
         for (uint i = 0; i < payments.length; i++) {
-            // totalPayment += payments[i].amount;
             payMemberV2(payable(payments[i].to), payments[i].amount);
-            // payees[i] = payments[i].to;
         }
         console.log("Total Payment: %s", totalPayment);
         balance = address(this).balance;
