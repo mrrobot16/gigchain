@@ -9,6 +9,11 @@ struct Member {
     bool active; // This could be useful to check if a member is active or not to determine if should be paid.
 }
 
+struct Payment {
+    address to;
+    uint256 amount;
+}
+
 contract OrganizationV2 {
     address public owner;
     address public controller;
@@ -17,12 +22,16 @@ contract OrganizationV2 {
     address[] public membersAccountsV2;
     uint256 public memberCount;
     mapping(address => Member) public membersV2;
+    // mapping(uint => Payment) public payments;
+    Payment[] public memberPayments;
     event Transfer(address indexed from, address indexed to, uint256 value);
     event MultiTransfer(address indexed from, address[] indexed to, uint256[] value);
+    event MultiTransferV2(address indexed from, address[] indexed to, uint256 value);
     event ReceiveEth(address indexed from, uint256 value);
     event AddMember(address indexed member);
     event RemoveMember(address indexed member);
     error TransferFailed();
+    error NotEnoughEtherBalance();
 
     receive() external payable {
         emit ReceiveEth(msg.sender, msg.value);
@@ -42,8 +51,11 @@ contract OrganizationV2 {
         }
     }
 
-    function addMemberV2(address account) public onlyController("addMemberV2") {
-        require(!membersV2[account].exists, "Member already exists");
+    function addMemberV2(address account) 
+        public 
+        onlyController("addMemberV2") 
+        mustNotExistMember(account)
+    {
         Member memory member = Member(account, 0, true, true);
         membersV2[account] = member;
         membersAccountsV2.push(account);
@@ -51,8 +63,11 @@ contract OrganizationV2 {
         emit AddMember(membersV2[account].account);
     }
 
-    function removeMemberV2(address account) public onlyController("removeMemberV2") {
-        require(membersV2[account].exists, "Member does not exist");
+    function removeMemberV2(address account) 
+        public 
+        onlyController("removeMemberV2")
+        mustExistMember(account)
+    {
         membersV2[account].exists = false;
         delete(membersV2[account]);
         memberCount--;
@@ -66,15 +81,45 @@ contract OrganizationV2 {
         }
     }
 
-    function payMemberV2(address payable _member, uint256 _amount) public {
-        require(msg.sender == controller, "You must be the controller to pay members");
-        require(_amount > 0, "You must send ether to pay members");
-        require(membersV2[_member].exists, "Member does not exist");  
+    function payMemberV2(address payable _member, uint256 _amount) 
+        public 
+        onlyController("payMemberV2") 
+        mustSendEther(_amount)
+        correctAmount(_amount)
+        mustExistMember(_member) 
+    {
         if(_member.send(_amount)) {
            emit Transfer(address(this), _member, _amount);
         } else {
             revert TransferFailed();
         }
+    }
+
+    function payMembersV2(bytes memory _payments) 
+        public
+        onlyController("payMembersV2")
+    {
+        (Payment[] memory payments) = abi.decode(_payments, (Payment[]));
+        uint256 balance = address(this).balance;
+        console.log("Before payMember Balance: %s", balance);
+        uint256 totalPayment = 0;
+        address[] memory payees = new address[](payments.length);
+        for (uint i = 0; i < payments.length; i++) {
+            totalPayment += payments[i].amount;
+            payees[i] = payments[i].to;
+        }
+        if(address(this).balance < totalPayment) {
+            revert NotEnoughEtherBalance();
+        }
+        for (uint i = 0; i < payments.length; i++) {
+            // totalPayment += payments[i].amount;
+            payMemberV2(payable(payments[i].to), payments[i].amount);
+            // payees[i] = payments[i].to;
+        }
+        console.log("Total Payment: %s", totalPayment);
+        balance = address(this).balance;
+        console.log("After payMember Balance: %s", balance);
+        emit MultiTransferV2(address(this), payees, totalPayment);
     }
 
     function payMember(address payable _member, uint256 _amount)
@@ -113,7 +158,7 @@ contract OrganizationV2 {
     {
         Member[] memory membersArray = new Member[](memberCount);
         uint256 index = 0;
-        for (uint i = 0; i < membersAccountsV2.length; i++) {
+        for (uint i = 0; i < membersArray.length; i++) {
             if (membersV2[membersAccountsV2[i]].exists) {
                 membersArray[index] = membersV2[membersAccountsV2[i]];
                 index++;
@@ -144,6 +189,15 @@ contract OrganizationV2 {
         _;
     }
     
+    modifier mustExistMember(address _member) {
+        require(membersV2[_member].exists == true, "Member does not exist");
+        _;
+    }
+
+    modifier mustNotExistMember(address account) {
+        require(membersV2[account].exists == false, "Member already exists");
+        _;
+    }
     
     modifier memberMustExist(address _member) {
         require(getMemberV2(_member).account != address(0), "Member does not exist");
