@@ -37,9 +37,7 @@ describe('Organization Contract V2', function () {
     // Checkout https://github.com/NomicFoundation/hardhat-boilerplate/blob/d3d81691855e6666fcdac90dbdd28f349ec68597/test/Token.js#L25
     // NOTE: Before all tests, deploy the contract and get the contract instance
     this.beforeAll(async () => {
-        contract = await ethers.getContractFactory(
-            ORGANIZATION_CONTRACT_V2,
-        );
+        contract = await ethers.getContractFactory(ORGANIZATION_CONTRACT_V2);
         const encodedOrganizationDeploymentData = [
             ORGANIZATION_NAME_TEST,
             membersV2,
@@ -88,7 +86,9 @@ describe('Organization Contract V2', function () {
         let expectedCorrectMemberCount = 5;
         it('Should have the correct member count', async function () {
             const actualMemberCount = await organization.getMemberCountV2();
-            expect(actualMemberCount.toNumber()).equal(expectedCorrectMemberCount);
+            expect(actualMemberCount.toNumber()).equal(
+                expectedCorrectMemberCount
+            );
         });
 
         it('Should get all members accounts', async function () {
@@ -97,9 +97,11 @@ describe('Organization Contract V2', function () {
             expect(orgMembers.length).equal(expectedCorrectMemberCount);
             expect(memberCount.toNumber()).equal(orgMembers.length);
         });
-        
+
         it('Should get a member', async function () {
-            const getMember: Member = await organization.getMemberV2(memberV2.account);
+            const getMember: Member = await organization.getMemberV2(
+                memberV2.account
+            );
             expect(getMember.account).equal(memberV2.account);
         });
 
@@ -108,19 +110,27 @@ describe('Organization Contract V2', function () {
             expect(before_add_members.length).equal(expectedCorrectMemberCount);
             await organization.addMemberV2(newMemberV2.account);
             const after_add_members = await organization.getMembersV2();
-            expectedCorrectMemberCount++
+            expectedCorrectMemberCount++;
             expect(after_add_members.length).equal(expectedCorrectMemberCount);
-            expect(after_add_members[after_add_members.length - 1].account).equal(newMemberV2.account);
+            expect(
+                after_add_members[after_add_members.length - 1].account
+            ).equal(newMemberV2.account);
         });
 
         it('Should remove a member', async function () {
             const before_remove_members = await organization.getMembersV2();
             await organization.removeMemberV2(MEMBERS_V2_ACCOUNTS[2]);
             const after_remove_members = await organization.getMembersV2();
-            const getMember = await organization.getMemberV2(MEMBERS_V2_ACCOUNTS[2]);
+            const getMember = await organization.getMemberV2(
+                MEMBERS_V2_ACCOUNTS[2]
+            );
 
-            expect(after_remove_members.length).equal(before_remove_members.length - 1);
-            expect(after_remove_members[2].account).equal(NEW_MEMBER_V2.account);
+            expect(after_remove_members.length).equal(
+                before_remove_members.length - 1
+            );
+            expect(after_remove_members[2].account).equal(
+                NEW_MEMBER_V2.account
+            );
             expect(getMember.account).equal(ADDRESS_ZERO);
         });
 

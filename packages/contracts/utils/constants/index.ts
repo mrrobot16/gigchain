@@ -1,7 +1,7 @@
 import { ethers } from 'hardhat';
-export * from "./member";
-export * from "./organization";
-export * from "./payment";
+export * from './member';
+export * from './organization';
+export * from './payment';
 export const { HARDHAT_NETWORK } = process.env;
 
 const Network = HARDHAT_NETWORK || 'hardhat';
