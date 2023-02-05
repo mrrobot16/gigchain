@@ -6,3 +6,9 @@ export interface Member {
   exists: boolean;
   active: boolean;
 }
+
+export interface Payment {
+  amount: string | number | BigNumber;
+  to: Member["account"];
+
+}
