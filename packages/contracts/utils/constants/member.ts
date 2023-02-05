@@ -16,7 +16,6 @@ export const RANDOM_MEMBER_ACCOUNT = '0x07d278B7a3872e5c4536A7C0e5Ab9759206976aA
 
 const BALANCE_ZERO = ethers.utils.parseEther('0');
 
-
 const Member1_V2 = {
   account: MEMBER_1_ACCOUNT,
   balance: BALANCE_ZERO,
@@ -51,7 +50,6 @@ export const NEW_MEMBER_V2 = {
   exists: true,
   active: true,
 }
-
 
 export const MEMBERS_V2 = [
   Member1_V2,

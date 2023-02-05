@@ -17,7 +17,7 @@ import {
 
 import { Member } from '../types';
 
-describe.only('Organization Contract V2', function () {
+describe('Organization Contract V2', function () {
     let contract: ContractFactory;
     let organization: Contract;
     let address: string;
