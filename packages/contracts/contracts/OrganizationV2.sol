@@ -11,8 +11,12 @@ struct Member {
 
 contract OrganizationV2 {
     address public owner;
+    address public controller;
     string public name;
     address[] public members;
+    address[] public membersAccountsV2;
+    uint256 public memberCount;
+    mapping(address => Member) public membersV2;
     event Transfer(address indexed from, address indexed to, uint256 value);
     event MultiTransfer(address indexed from, address[] indexed to, uint256[] value);
     event ReceiveEth(address indexed from, uint256 value);
@@ -26,31 +30,56 @@ contract OrganizationV2 {
 
     constructor(string memory _name, address[] memory _members) payable {
         owner = msg.sender;
+        controller = msg.sender;
         name = _name;
-        members = _members;
-        addMember(owner);
-        console.log("OrganizationV2: %s", name);
+        addMembersV2(_members);
+        addMemberV2(controller);
     }
 
-    function addMember(address _member) public onlyOwner("addMember") {
-        members.push(_member);
-        emit AddMember(_member);
+    function addMembersV2(address[] memory _members) public onlyController("addMembers") {
+        for (uint i = 0; i < _members.length; i++) {
+            addMemberV2(_members[i]);
+        }
     }
 
-    function removeMember(address _member) public onlyOwner("removeMember") {
-        for (uint i = 0; i < members.length; i++) {
-            if (members[i] == _member) {
-                members[i] = members[members.length - 1];
-                members.pop();
-                emit RemoveMember(_member);
+    function addMemberV2(address account) public onlyController("addMemberV2") {
+        require(!membersV2[account].exists, "Member already exists");
+        Member memory member = Member(account, 0, true, true);
+        membersV2[account] = member;
+        membersAccountsV2.push(account);
+        memberCount++;
+        emit AddMember(membersV2[account].account);
+    }
+
+    function removeMemberV2(address account) public onlyController("removeMemberV2") {
+        require(membersV2[account].exists, "Member does not exist");
+        membersV2[account].exists = false;
+        delete(membersV2[account]);
+        memberCount--;
+        for (uint i = 0; i < membersAccountsV2.length; i++) {
+            if (membersAccountsV2[i] == account) {
+                membersAccountsV2[i] = membersAccountsV2[membersAccountsV2.length - 1];
+                membersAccountsV2.pop();
+                emit RemoveMember(account);
                 break;
             }
         }
     }
 
+    function payMemberV2(address payable _member, uint256 _amount) public {
+        require(msg.sender == controller, "You must be the controller to pay members");
+        require(_amount > 0, "You must send ether to pay members");
+        require(membersV2[_member].exists, "Member does not exist");  
+        if(_member.send(_amount)) {
+           emit Transfer(address(this), _member, _amount);
+        } else {
+            revert TransferFailed();
+        }
+    }
+
     function payMember(address payable _member, uint256 _amount)
         public payable
-        onlyOwner("payMember") 
+        onlyController("payMember") 
         correctAmount(_amount)
         memberMustExist(_member)  
         mustSendEther(_amount)
@@ -64,7 +93,7 @@ contract OrganizationV2 {
         balance = address(this).balance;
     }
 
-    function payMembers(address[] memory _members, uint256[] memory _amounts) public onlyOwner("payMembers") {
+    function payMembers(address[] memory _members, uint256[] memory _amounts) public onlyController("payMembers") {
         // TODO: Need to refactor this to use array of objects with address and amount.
         // TODO: Need to refactor this to use a mapping of address to amount.
         require(_members.length == _amounts.length, "You must send the correct amount of members and amounts");
@@ -77,25 +106,40 @@ contract OrganizationV2 {
         emit MultiTransfer(address(this), _members, _amounts);
     }
 
-    function getMembers() public view returns (address[] memory) {
-        return members;
-    }
-
-    function getMemberCount() public view returns (uint) {
-        return members.length;
-    }
-
-    function getMember(address member) public view returns (address) {
-        for (uint i = 0; i < members.length; i++) {
-            if (members[i] == member) {
-                return members[i];
+    function getMembersV2()
+        public 
+        view
+        returns (Member[] memory)
+    {
+        Member[] memory membersArray = new Member[](memberCount);
+        uint256 index = 0;
+        for (uint i = 0; i < membersAccountsV2.length; i++) {
+            if (membersV2[membersAccountsV2[i]].exists) {
+                membersArray[index] = membersV2[membersAccountsV2[i]];
+                index++;
             }
         }
-        return address(0);
+        return membersArray;
+    } 
+    
+    function getMembers() public view returns (address[] memory) {
+        return membersAccountsV2;
+    }
+
+    function getMemberCountV2() public view returns (uint256) {
+        return memberCount;
+    }
+
+    function getMemberV2(address account) public view returns (Member memory) {
+        return membersV2[account];
     }
 
     function getBalance() public view returns (uint256) {
         return address(this).balance;
+    }
+
+    function transferControllership(address newController) public onlyOwner("transferControllership") {
+        controller = newController;
     }
 
     modifier onlyOwner(string memory functionName) {
@@ -104,8 +148,9 @@ contract OrganizationV2 {
         _;
     }
     
+    
     modifier memberMustExist(address _member) {
-        require(getMember(_member) != address(0), "Member does not exist");
+        require(getMemberV2(_member).account != address(0), "Member does not exist");
         _;
     }
 
@@ -129,4 +174,9 @@ contract OrganizationV2 {
         _;
     }
 
+    modifier onlyController(string memory functionName) {
+        string memory message = string(abi.encodePacked("Only the controller can call: ", functionName));
+        require(msg.sender == controller, message);
+        _;
+    }
 }
