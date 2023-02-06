@@ -7,7 +7,6 @@ import {
     NEW_MEMBER_V2,
     RANDOM_MEMBER_ACCOUNT,
     ADDRESS_ZERO,
-    // PAYROll_TESTS,
     ORGANIZATION_CONTRACT_V2,
     ORGANIZATION_NAME_TEST,
     ORGANIZATION_DEPOSIT_TEST,
@@ -20,7 +19,7 @@ import {
     NOT_ENOUGH_ETHER_BALANCE_ERROR,
 } from '../utils/constants';
 
-import { Member, ErrorMessage, Payment } from '../types';
+import { Member, ErrorMessage } from '../types';
 
 describe('Organization Contract V2', function () {
     let contract: ContractFactory;
