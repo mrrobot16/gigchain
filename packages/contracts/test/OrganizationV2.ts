@@ -7,16 +7,17 @@ import {
     NEW_MEMBER_V2,
     RANDOM_MEMBER_ACCOUNT,
     ADDRESS_ZERO,
-    PAYROll_TESTS,
+    // PAYROll_TESTS,
     ORGANIZATION_CONTRACT_V2,
     ORGANIZATION_NAME_TEST,
     ORGANIZATION_DEPOSIT_TEST,
     MEMBERS_V2_ACCOUNTS,
     MEMBERS_V2,
     MEMBER_DOES_NOT_EXIST_ERROR,
-    // TRANSFER_FAILED_REVERT_ERROR,
     MUST_SEND_CORRECT_AMOUNT_ETHER_ERROR,
     PAYMENTS_V2,
+    PAYMENTS_FAIL_V2,
+    NOT_ENOUGH_ETHER_BALANCE_ERROR,
 } from '../utils/constants';
 
 import { Member, ErrorMessage, Payment } from '../types';
@@ -87,7 +88,6 @@ describe('Organization Contract V2', function () {
     });
 
     describe('Members', function () {
-        // let expectedCorrectMemberCount = 5;
         it('Should have the correct member count', async function () {
             let expectedCorrectMemberCount = 5;
             const actualMemberCount = await organization.getMemberCountV2();
@@ -98,7 +98,6 @@ describe('Organization Contract V2', function () {
 
         it('Should get all members accounts', async function () {
             let expectedCorrectMemberCount = 5;
-            // expect(members.length).equal(expectedCorrectMemberCount);
             const orgMembers: string[] = await organization.getMembersV2();
             expect(orgMembers.length).equal(expectedCorrectMemberCount);
             expect(memberCount.toNumber()).equal(orgMembers.length);
@@ -197,20 +196,34 @@ describe('Organization Contract V2', function () {
                 const encodedPaymentsObjects = PAYMENTS_V2.map(payment => {
                     return utils.defaultAbiCoder.encode(["address", "uint256"], [ payment.to, payment.amount]);
                 });
-                console.log('encodedPaymentsObjects', encodedPaymentsObjects);
-                
                 const encodedPayments = utils.defaultAbiCoder.encode(["bytes[]"], [encodedPaymentsObjects]);
-                console.log('encodedPayments', encodedPayments);
-
-                // let decodedData = ethers.utils.defaultAbiCoder.decode(["bytes"], encodedPayments);
-                // console.log('decodedData', decodedData);
-
-                await organization.payMembersV2(encodedPayments);
+                const tx = await organization.payMembersV2(encodedPayments);
+                const result = await tx.wait();
+                // NOTE
+                // it should emit PAYMENTS_V2.length + 1 events. 
+                // 1 for the PayMembersV2 event and 1 for each PayMemberV2 event
+                const expectedEventsCount = PAYMENTS_V2.length + 1; 
+                expect(result.logs.length).equal(PAYMENTS_V2.length + 1); 
+                
             } catch (error) {
-                console.log((error as ErrorMessage).message)
-                // throw(error)
+                throw(error);
             }
             const balanceAfter = await organization.getBalance();
+        });
+
+        it('Should not pay list of members', async function () {
+            const balance = await organization.getBalance();
+            try {                
+                const encodedPaymentsObjects = PAYMENTS_FAIL_V2.map(payment => {
+                    return utils.defaultAbiCoder.encode(["address", "uint256"], [ payment.to, payment.amount]);
+                });
+                const encodedPayments = utils.defaultAbiCoder.encode(["bytes[]"], [encodedPaymentsObjects]);
+                const tx = await organization.payMembersV2(encodedPayments);               
+            } catch (error) {
+                expect((error as ErrorMessage).message).equal(NOT_ENOUGH_ETHER_BALANCE_ERROR);
+            }
+            const balanceAfter = await organization.getBalance();
+            expect(balance).equal(balanceAfter);
         });
     });
 });
