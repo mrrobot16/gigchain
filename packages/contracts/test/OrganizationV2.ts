@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
-import { BigNumber, ContractFactory, Contract, utils,  } from 'ethers';
+import { BigNumber, ContractFactory, Contract, utils } from 'ethers';
 
 import {
     NEW_MEMBER_ACCOUNT,
@@ -116,7 +116,9 @@ describe('Organization Contract V2', function () {
             await organization.addMemberV2(newMemberV2.account);
             const after_add_members = await organization.getMembersV2();
 
-            expect(before_add_members.length).equal(expectedCorrectMemberCount-1);
+            expect(before_add_members.length).equal(
+                expectedCorrectMemberCount - 1
+            );
             expect(after_add_members.length).equal(expectedCorrectMemberCount);
             expect(
                 after_add_members[after_add_members.length - 1].account
@@ -128,14 +130,18 @@ describe('Organization Contract V2', function () {
             const before_remove_members = await organization.getMembersV2();
 
             await organization.removeMemberV2(MEMBERS_V2_ACCOUNTS[2]);
-            
+
             const after_remove_members = await organization.getMembersV2();
             const getMember = await organization.getMemberV2(
                 MEMBERS_V2_ACCOUNTS[2]
             );
 
-            expect(before_remove_members.length).equal(expectedCorrectMemberCount+1);
-            expect(after_remove_members.length).equal(expectedCorrectMemberCount);
+            expect(before_remove_members.length).equal(
+                expectedCorrectMemberCount + 1
+            );
+            expect(after_remove_members.length).equal(
+                expectedCorrectMemberCount
+            );
             expect(after_remove_members.length).equal(
                 before_remove_members.length - 1
             );
@@ -185,42 +191,59 @@ describe('Organization Contract V2', function () {
                 await organization.payMemberV2(member, amount);
             } catch (error) {
                 const balanceAfter = await organization.getBalance();
-                expect((error as ErrorMessage).message).equal(MUST_SEND_CORRECT_AMOUNT_ETHER_ERROR);
-                expect(balanceBefore).equal(balanceAfter);     
+                expect((error as ErrorMessage).message).equal(
+                    MUST_SEND_CORRECT_AMOUNT_ETHER_ERROR
+                );
+                expect(balanceBefore).equal(balanceAfter);
             }
         });
 
         it('Should pay list of members', async function () {
             const balance = await organization.getBalance();
-            try {                
-                const encodedPaymentsObjects = PAYMENTS_V2.map(payment => {
-                    return utils.defaultAbiCoder.encode(["address", "uint256"], [ payment.to, payment.amount]);
+            try {
+                const encodedPaymentsObjects = PAYMENTS_V2.map((payment) => {
+                    return utils.defaultAbiCoder.encode(
+                        ['address', 'uint256'],
+                        [payment.to, payment.amount]
+                    );
                 });
-                const encodedPayments = utils.defaultAbiCoder.encode(["bytes[]"], [encodedPaymentsObjects]);
+                const encodedPayments = utils.defaultAbiCoder.encode(
+                    ['bytes[]'],
+                    [encodedPaymentsObjects]
+                );
                 const tx = await organization.payMembersV2(encodedPayments);
                 const result = await tx.wait();
                 // NOTE
-                // it should emit PAYMENTS_V2.length + 1 events. 
+                // it should emit PAYMENTS_V2.length + 1 events.
                 // 1 for the PayMembersV2 event and 1 for each PayMemberV2 event
-                const expectedEventsCount = PAYMENTS_V2.length + 1; 
-                expect(result.logs.length).equal(PAYMENTS_V2.length + 1); 
-                
+                const expectedEventsCount = PAYMENTS_V2.length + 1;
+                expect(result.logs.length).equal(PAYMENTS_V2.length + 1);
             } catch (error) {
-                throw(error);
+                throw error;
             }
             const balanceAfter = await organization.getBalance();
         });
 
         it('Should not pay list of members', async function () {
             const balance = await organization.getBalance();
-            try {                
-                const encodedPaymentsObjects = PAYMENTS_FAIL_V2.map(payment => {
-                    return utils.defaultAbiCoder.encode(["address", "uint256"], [ payment.to, payment.amount]);
-                });
-                const encodedPayments = utils.defaultAbiCoder.encode(["bytes[]"], [encodedPaymentsObjects]);
-                const tx = await organization.payMembersV2(encodedPayments);               
+            try {
+                const encodedPaymentsObjects = PAYMENTS_FAIL_V2.map(
+                    (payment) => {
+                        return utils.defaultAbiCoder.encode(
+                            ['address', 'uint256'],
+                            [payment.to, payment.amount]
+                        );
+                    }
+                );
+                const encodedPayments = utils.defaultAbiCoder.encode(
+                    ['bytes[]'],
+                    [encodedPaymentsObjects]
+                );
+                const tx = await organization.payMembersV2(encodedPayments);
             } catch (error) {
-                expect((error as ErrorMessage).message).equal(NOT_ENOUGH_ETHER_BALANCE_ERROR);
+                expect((error as ErrorMessage).message).equal(
+                    NOT_ENOUGH_ETHER_BALANCE_ERROR
+                );
             }
             const balanceAfter = await organization.getBalance();
             expect(balance).equal(balanceAfter);

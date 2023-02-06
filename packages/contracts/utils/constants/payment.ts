@@ -53,10 +53,7 @@ export const PAYMENTS_V2 = [
     PAYMENT_4, // This is the added member test.
 ];
 
-export const PAYMENTS_FAIL_V2 = [
-    PAYMENT_1_FAIL,
-    PAYMENT_2_FAIL,
-]
+export const PAYMENTS_FAIL_V2 = [PAYMENT_1_FAIL, PAYMENT_2_FAIL];
 
 const PAYMENT_1_GOERLI_V2: Payment = {
     amount: utils.parseEther('0.0000000123456'),
