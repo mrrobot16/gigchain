@@ -19,13 +19,13 @@ contract OrganizationV1 {
     address public owner;
     address public controller;
     string public name;
-    address[] public membersAccountsV1;
+    address[] public membersAccounts;
     uint256 public memberCount;
-    mapping(address => Member) public membersV1;
+    mapping(address => Member) public members;
     Payment[] public payments;
 
     event Transfer(address indexed from, address indexed to, uint256 value);
-    event MultiTransferV1(address indexed from, address[] indexed to, uint256 value);
+    event MultiTransfer(address indexed from, address[] indexed to, uint256 value);
     event ReceiveEth(address indexed from, uint256 value);
     event AddMember(address indexed member);
     event RemoveMember(address indexed member);
@@ -40,49 +40,49 @@ contract OrganizationV1 {
         owner = msg.sender;
         controller = msg.sender;
         name = _name;
-        addMembersV1(_members);
-        addMemberV1(controller);
+        addMembers(_members);
+        addMember(controller);
     }
 
-    function addMembersV1(address[] memory _members) public onlyController("addMembers") {
+    function addMembers(address[] memory _members) public onlyController("addMembers") {
         for (uint i = 0; i < _members.length; i++) {
-            addMemberV1(_members[i]);
+            addMember(_members[i]);
         }
     }
 
-    function addMemberV1(address account) 
+    function addMember(address account) 
         public 
-        onlyController("addMemberV1") 
+        onlyController("addMember") 
         mustNotExistMember(account)
     {
         Member memory member = Member(account, 0, true, true);
-        membersV1[account] = member;
-        membersAccountsV1.push(account);
+        members[account] = member;
+        membersAccounts.push(account);
         memberCount++;
-        emit AddMember(membersV1[account].account);
+        emit AddMember(members[account].account);
     }
 
-    function removeMemberV1(address account) 
+    function removeMember(address account) 
         public 
-        onlyController("removeMemberV1")
+        onlyController("removeMember")
         mustExistMember(account)
     {
-        membersV1[account].exists = false;
-        delete(membersV1[account]);
+        members[account].exists = false;
+        delete(members[account]);
         memberCount--;
-        for (uint i = 0; i < membersAccountsV1.length; i++) {
-            if (membersAccountsV1[i] == account) {
-                membersAccountsV1[i] = membersAccountsV1[membersAccountsV1.length - 1];
-                membersAccountsV1.pop();
+        for (uint i = 0; i < membersAccounts.length; i++) {
+            if (membersAccounts[i] == account) {
+                membersAccounts[i] = membersAccounts[membersAccounts.length - 1];
+                membersAccounts.pop();
                 emit RemoveMember(account);
                 break;
             }
         }
     }
 
-    function payMemberV1(address payable _member, uint256 _amount) 
+    function payMember(address payable _member, uint256 _amount) 
         public 
-        onlyController("payMemberV1") 
+        onlyController("payMember") 
         mustSendEther(_amount)
         correctAmount(_amount)
         mustExistMember(_member) 
@@ -94,9 +94,9 @@ contract OrganizationV1 {
         }
     }
 
-    function payMembersV1(bytes memory _payments) 
+    function payMembers(bytes memory _payments) 
         public
-        onlyController("payMembersV1")
+        onlyController("payMembers")
     {
         (bytes[] memory decoded) = abi.decode(_payments, (bytes[])); // This should a Payment[] struct instead of bytes[]. :/ 
         uint256 totalPayment = 0;
@@ -109,12 +109,12 @@ contract OrganizationV1 {
             Payment memory payment = Payment(to, amount, block.timestamp);
             payments.push(payment);
             payees[i] = to;
-            payMemberV1(payable(to), amount);
+            payMember(payable(to), amount);
         }
-        emit MultiTransferV1(address(this), payees, totalPayment);
+        emit MultiTransfer(address(this), payees, totalPayment);
     }
 
-    function getMembersV1()
+    function getMembers()
         public 
         view
         returns (Member[] memory)
@@ -122,20 +122,20 @@ contract OrganizationV1 {
         Member[] memory membersArray = new Member[](memberCount);
         uint256 index = 0;
         for (uint i = 0; i < membersArray.length; i++) {
-            if (membersV1[membersAccountsV1[i]].exists) {
-                membersArray[index] = membersV1[membersAccountsV1[i]];
+            if (members[membersAccounts[i]].exists) {
+                membersArray[index] = members[membersAccounts[i]];
                 index++;
             }
         }
         return membersArray;
     }
 
-    function getMemberCountV1() public view returns (uint256) {
+    function getMemberCount() public view returns (uint256) {
         return memberCount;
     }
 
-    function getMemberV1(address account) public view returns (Member memory) {
-        return membersV1[account];
+    function getMember(address account) public view returns (Member memory) {
+        return members[account];
     }
 
     function getBalance() public view returns (uint256) {
@@ -153,17 +153,17 @@ contract OrganizationV1 {
     }
     
     modifier mustExistMember(address _member) {
-        require(membersV1[_member].exists == true, "Member does not exist");
+        require(members[_member].exists == true, "Member does not exist");
         _;
     }
 
     modifier mustNotExistMember(address account) {
-        require(membersV1[account].exists == false, "Member already exists");
+        require(members[account].exists == false, "Member already exists");
         _;
     }
     
     modifier memberMustExist(address _member) {
-        require(getMemberV1(_member).account != address(0), "Member does not exist");
+        require(getMember(_member).account != address(0), "Member does not exist");
         _;
     }
 

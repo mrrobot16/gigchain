@@ -52,8 +52,8 @@ describe('Organization Contract V1', function () {
             // encodeOrganizationDeploymentData,
             { value: ORGANIZATION_DEPOSIT_TEST, gasLimit: 10000000 }
         );
-        membersV1 = await organization.getMembersV1();
-        memberCount = await organization.getMemberCountV1();
+        membersV1 = await organization.getMembers();
+        memberCount = await organization.getMemberCount();
         address = organization.address;
         name = await organization.name();
         balance = await organization.getBalance();
@@ -89,7 +89,7 @@ describe('Organization Contract V1', function () {
     describe('Members', function () {
         it('Should have the correct member count', async function () {
             let expectedCorrectMemberCount = 5;
-            const actualMemberCount = await organization.getMemberCountV1();
+            const actualMemberCount = await organization.getMemberCount();
             expect(actualMemberCount.toNumber()).equal(
                 expectedCorrectMemberCount
             );
@@ -97,13 +97,13 @@ describe('Organization Contract V1', function () {
 
         it('Should get all members accounts', async function () {
             let expectedCorrectMemberCount = 5;
-            const orgMembers: string[] = await organization.getMembersV1();
+            const orgMembers: string[] = await organization.getMembers();
             expect(orgMembers.length).equal(expectedCorrectMemberCount);
             expect(memberCount.toNumber()).equal(orgMembers.length);
         });
 
         it('Should get a member', async function () {
-            const getMember: Member = await organization.getMemberV1(
+            const getMember: Member = await organization.getMember(
                 memberV1.account
             );
             expect(getMember.account).equal(memberV1.account);
@@ -111,9 +111,9 @@ describe('Organization Contract V1', function () {
 
         it('Should add a member', async function () {
             let expectedCorrectMemberCount = 6;
-            const before_add_members = await organization.getMembersV1();
-            await organization.addMemberV1(newMemberV1.account);
-            const after_add_members = await organization.getMembersV1();
+            const before_add_members = await organization.getMembers();
+            await organization.addMember(newMemberV1.account);
+            const after_add_members = await organization.getMembers();
 
             expect(before_add_members.length).equal(
                 expectedCorrectMemberCount - 1
@@ -126,12 +126,12 @@ describe('Organization Contract V1', function () {
 
         it('Should remove a member', async function () {
             let expectedCorrectMemberCount = 5;
-            const before_remove_members = await organization.getMembersV1();
+            const before_remove_members = await organization.getMembers();
 
-            await organization.removeMemberV1(MEMBERS_V1_ACCOUNTS[2]);
+            await organization.removeMember(MEMBERS_V1_ACCOUNTS[2]);
 
-            const after_remove_members = await organization.getMembersV1();
-            const getMember = await organization.getMemberV1(
+            const after_remove_members = await organization.getMembers();
+            const getMember = await organization.getMember(
                 MEMBERS_V1_ACCOUNTS[2]
             );
 
@@ -151,7 +151,7 @@ describe('Organization Contract V1', function () {
         });
 
         it('Should not find a random member', async function () {
-            const getMember = await organization.getMemberV1(
+            const getMember = await organization.getMember(
                 RANDOM_MEMBER_ACCOUNT
             );
             expect(getMember.account).equal(ADDRESS_ZERO);
@@ -163,7 +163,7 @@ describe('Organization Contract V1', function () {
             const member = newMember;
             const amount = ethers.utils.parseEther('1');
             const balanceBefore = await organization.getBalance();
-            await organization.payMemberV1(member, amount);
+            await organization.payMember(member, amount);
             const balanceAfter = await organization.getBalance();
             expect(balanceBefore.sub(balanceAfter)).equal(amount);
         });
@@ -172,7 +172,7 @@ describe('Organization Contract V1', function () {
             const amount = ethers.utils.parseEther('1');
             const balanceBefore = await organization.getBalance();
             try {
-                await organization.payMemberV1(RANDOM_MEMBER_ACCOUNT, amount);
+                await organization.payMember(RANDOM_MEMBER_ACCOUNT, amount);
             } catch (error) {
                 const balanceAfter = await organization.getBalance();
                 expect((error as ErrorMessage).message).equal(
@@ -187,7 +187,7 @@ describe('Organization Contract V1', function () {
             const amount = ethers.utils.parseEther('100');
             const balanceBefore = await organization.getBalance();
             try {
-                await organization.payMemberV1(member, amount);
+                await organization.payMember(member, amount);
             } catch (error) {
                 const balanceAfter = await organization.getBalance();
                 expect((error as ErrorMessage).message).equal(
@@ -210,7 +210,7 @@ describe('Organization Contract V1', function () {
                     ['bytes[]'],
                     [encodedPaymentsObjects]
                 );
-                const tx = await organization.payMembersV1(encodedPayments);
+                const tx = await organization.payMembers(encodedPayments);
                 const result = await tx.wait();
                 // NOTE
                 // it should emit PAYMENTS_V2.length + 1 events.
@@ -238,7 +238,7 @@ describe('Organization Contract V1', function () {
                     ['bytes[]'],
                     [encodedPaymentsObjects]
                 );
-                const tx = await organization.payMembersV1(encodedPayments);
+                const tx = await organization.payMembers(encodedPayments);
             } catch (error) {
                 expect((error as ErrorMessage).message).equal(
                     NOT_ENOUGH_ETHER_BALANCE_ERROR
