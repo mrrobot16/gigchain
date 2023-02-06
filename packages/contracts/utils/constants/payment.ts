@@ -1,17 +1,18 @@
 import { ethers } from 'hardhat';
+import { utils } from 'ethers';
 
 import { Payment } from '../../types';
 import { MEMBERS_V2, NEW_MEMBER_V2, NEW_MEMBER_ACCOUNT } from './member';
 
-const MEMBER_1_PAYMENT_V2 = ethers.utils.parseEther('0.0000000012');
+const MEMBER_1_PAYMENT_V2 = utils.parseEther('0.0000000000012');
 
-const MEMBER_2_PAYMENT_V2 = ethers.utils.parseEther('0.0000000023');
+const MEMBER_2_PAYMENT_V2 = utils.parseEther('0.0000000000023');
 
-const MEMBER_3_PAYMENT_V2 = ethers.utils.parseEther('0.0000000045');
+const MEMBER_3_PAYMENT_V2 = utils.parseEther('0.0000000000045');
 
-export const PAY_MEMBER_AMOUNT_V2 = ethers.utils.parseEther('0.000001234567');
+export const PAY_MEMBER_AMOUNT_V2 = utils.parseEther('0.0000001234567');
 
-export const NEW_MEMBER_PAYMENT_V2 = ethers.utils.parseEther('0.0000000067');
+export const NEW_MEMBER_PAYMENT_V2 = utils.parseEther('0.0000000000067');
 
 const { [0]: MEMBER_1, [1]: MEMBER_2, [2]: MEMBER_3 } = MEMBERS_V2;
 
@@ -38,17 +39,17 @@ const PAYMENT_4: Payment = {
 export const PAYMENTS_V2 = [
     PAYMENT_1,
     PAYMENT_2,
-    // PAYMENT_3,
-    // PAYMENT_4,
+    PAYMENT_3,
+    PAYMENT_4,
 ];
 
 const PAYMENT_1_GOERLI_V2: Payment = {
-    amount: ethers.utils.parseEther('0.0000000123456'),
+    amount: utils.parseEther('0.0000000123456'),
     to: MEMBER_1.account,
 };
 
 const PAYMENT_2_GOERLI_V2: Payment = {
-    amount: ethers.utils.parseEther('0.0000000789101'),
+    amount: utils.parseEther('0.0000000789101'),
     to: MEMBER_2.account,
 };
 

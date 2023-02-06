@@ -191,27 +191,20 @@ describe('Organization Contract V2', function () {
             }
         });
 
-        // it('Should have enough balance to pay list of members', async function () {
-        //     const balance = await organization.getBalance();
-
-        //     const totalPayment = PAYMENTS_V2.reduce((a, b) => a.add(b));
-        //     const totalPayment = PAYMENTS_V2.map(
-        //         (payment) => ethers.utils.parseEther(payment)
-        //         payment => payment.amount
-        //     ).reduce((a, b) => a.add(b));
-        //     expect(balance).to.greaterThanOrEqual(totalPayment);
-        // });
-
         it('Should pay list of members', async function () {
             const balance = await organization.getBalance();
-            try {
+            try {                
                 const encodedPaymentsObjects = PAYMENTS_V2.map(payment => {
-                    return new utils.AbiCoder().encode(["uint256", "address"], [payment.amount, payment.to]);
+                    return utils.defaultAbiCoder.encode(["address", "uint256"], [ payment.to, payment.amount]);
                 });
                 console.log('encodedPaymentsObjects', encodedPaymentsObjects);
                 
-                const encodedPayments = new utils.AbiCoder().encode(["bytes[]"], [encodedPaymentsObjects]);
+                const encodedPayments = utils.defaultAbiCoder.encode(["bytes[]"], [encodedPaymentsObjects]);
                 console.log('encodedPayments', encodedPayments);
+
+                // let decodedData = ethers.utils.defaultAbiCoder.decode(["bytes"], encodedPayments);
+                // console.log('decodedData', decodedData);
+
                 await organization.payMembersV2(encodedPayments);
             } catch (error) {
                 console.log((error as ErrorMessage).message)
