@@ -146,11 +146,7 @@ contract OrganizationV1 {
         controller = newController;
     }
 
-    modifier onlyOwner(string memory functionName) {
-        string memory message = string(abi.encodePacked("Only the owner can call: ", functionName));
-        require(msg.sender == owner, message);
-        _;
-    }
+
     
     modifier mustExistMember(address _member) {
         require(members[_member].exists == true, "Member does not exist");
@@ -164,6 +160,12 @@ contract OrganizationV1 {
     
     modifier memberMustExist(address _member) {
         require(getMember(_member).account != address(0), "Member does not exist");
+        _;
+    }
+
+    modifier onlyOwner(string memory functionName) {
+        string memory message = string(abi.encodePacked("Only the owner can call: ", functionName));
+        require(msg.sender == owner, message);
         _;
     }
 
