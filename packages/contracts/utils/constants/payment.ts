@@ -36,12 +36,27 @@ const PAYMENT_4: Payment = {
     to: NEW_MEMBER_ACCOUNT,
 };
 
+const PAYMENT_1_FAIL: Payment = {
+    amount: utils.parseEther('1000'),
+    to: MEMBER_1.account,
+};
+
+const PAYMENT_2_FAIL: Payment = {
+    amount: utils.parseEther('1000'),
+    to: MEMBER_2.account,
+};
+
 export const PAYMENTS_V2 = [
     PAYMENT_1,
     PAYMENT_2,
-    PAYMENT_3,
-    PAYMENT_4,
+    // PAYMENT_3, // This payment is not included in the test because in the test suite that member is removed.
+    PAYMENT_4, // This is the added member test.
 ];
+
+export const PAYMENTS_FAIL_V2 = [
+    PAYMENT_1_FAIL,
+    PAYMENT_2_FAIL,
+]
 
 const PAYMENT_1_GOERLI_V2: Payment = {
     amount: utils.parseEther('0.0000000123456'),
