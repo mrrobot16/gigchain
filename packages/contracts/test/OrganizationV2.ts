@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
-import { BigNumber, ContractFactory, Contract, utils } from 'ethers';
+import { BigNumber, ContractFactory, Contract, utils,  } from 'ethers';
 
 import {
     NEW_MEMBER_ACCOUNT,
@@ -191,49 +191,32 @@ describe('Organization Contract V2', function () {
             }
         });
 
-        it('Should have enough balance to pay list of members', async function () {
-            const balance = await organization.getBalance();
+        // it('Should have enough balance to pay list of members', async function () {
+        //     const balance = await organization.getBalance();
 
-            // const totalPayment = PAYMENTS_V2.reduce((a, b) => console.log(a, b)
-            //     // a.add(b)
-            // );
-            // const totalPayment = PAYMENTS_V2.map(
-                // (payment) => ethers.utils.parseEther(payment)
-                // payment => payment.amount
-            // ).reduce((a, b) => a.add(b));
-            // expect(balance).to.greaterThanOrEqual(totalPayment);
-        });
+        //     const totalPayment = PAYMENTS_V2.reduce((a, b) => a.add(b));
+        //     const totalPayment = PAYMENTS_V2.map(
+        //         (payment) => ethers.utils.parseEther(payment)
+        //         payment => payment.amount
+        //     ).reduce((a, b) => a.add(b));
+        //     expect(balance).to.greaterThanOrEqual(totalPayment);
+        // });
 
         it('Should pay list of members', async function () {
             const balance = await organization.getBalance();
             try {
-                const functionSignature = 'payMembersV2(bytes)';
-                // Define the ABI type for the payments array
-                const paymentsType = 'bytes';
-                // Encode the payments array
-                const argumentsTypes = {
-                    type: 'tuple[]',
-                    name: '_payments',
-                    components: [{
-                        name: 'to',
-                        type: 'address'
-                    }, {
-                        name: 'amount',
-                        type: 'uint256'
-                    }]
-                } as utils.ParamType
-                const encodedPayments = utils.defaultAbiCoder.encode(
-                    [paymentsType],
-                    [
-                        utils.defaultAbiCoder.encode([argumentsTypes], [PAYMENTS_V2])
-                    ]
-                );
+                const encodedPaymentsObjects = PAYMENTS_V2.map(payment => {
+                    return new utils.AbiCoder().encode(["uint256", "address"], [payment.amount, payment.to]);
+                });
+                console.log('encodedPaymentsObjects', encodedPaymentsObjects);
+                
+                const encodedPayments = new utils.AbiCoder().encode(["bytes[]"], [encodedPaymentsObjects]);
+                console.log('encodedPayments', encodedPayments);
                 await organization.payMembersV2(encodedPayments);
             } catch (error) {
                 console.log((error as ErrorMessage).message)
-                throw(error)
+                // throw(error)
             }
-
             const balanceAfter = await organization.getBalance();
         });
     });

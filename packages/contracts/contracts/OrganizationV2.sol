@@ -101,10 +101,12 @@ contract OrganizationV2 {
     {
         (Payment[] memory payments) = abi.decode(_payments, (Payment[]));
         uint256 balance = address(this).balance;
-        console.log("Before payMember Balance: %s", balance);
         uint256 totalPayment = 0;
+
         address[] memory payees = new address[](payments.length);
         for (uint i = 0; i < payments.length; i++) {
+            console.log("payments[i].to: %s", payments[i].to);
+            console.log("payments[i].amount: %s", payments[i].amount);
             totalPayment += payments[i].amount;
             payees[i] = payments[i].to;
         }
@@ -114,9 +116,8 @@ contract OrganizationV2 {
         for (uint i = 0; i < payments.length; i++) {
             payMemberV2(payable(payments[i].to), payments[i].amount);
         }
-        console.log("Total Payment: %s", totalPayment);
         balance = address(this).balance;
-        console.log("After payMember Balance: %s", balance);
+        console.log("After payMember Balance: %s :", balance);
         emit MultiTransferV2(address(this), payees, totalPayment);
     }
 
@@ -188,6 +189,7 @@ contract OrganizationV2 {
     }
     
     modifier mustExistMember(address _member) {
+        // console.log("mustExistMember _member: %s", _member);
         require(membersV2[_member].exists == true, "Member does not exist");
         _;
     }
