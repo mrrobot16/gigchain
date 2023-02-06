@@ -4,7 +4,7 @@
     "scripts": {
         "help": "npx hardhat help",
         "test": "npx hardhat test",
-        "test:organizationV2": "npx hardhat test test/OrganizationV2.ts",
+        "test:organizationV1": "npx hardhat test test/OrganizationV1.ts",
         "test:gas": "REPORT_GAS=true npx hardhat test",
         "node": "npx hardhat node",
         "hardhat:coverage": "npx hardhat coverage",

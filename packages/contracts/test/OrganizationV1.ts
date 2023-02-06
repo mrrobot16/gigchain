@@ -4,35 +4,35 @@ import { BigNumber, ContractFactory, Contract, utils } from 'ethers';
 
 import {
     NEW_MEMBER_ACCOUNT,
-    NEW_MEMBER_V2,
+    NEW_MEMBER_V1,
     RANDOM_MEMBER_ACCOUNT,
     ADDRESS_ZERO,
-    ORGANIZATION_CONTRACT_V2,
+    ORGANIZATION_CONTRACT_V1,
     ORGANIZATION_NAME_TEST,
     ORGANIZATION_DEPOSIT_TEST,
-    MEMBERS_V2_ACCOUNTS,
-    MEMBERS_V2,
+    MEMBERS_V1_ACCOUNTS,
+    MEMBERS_V1,
     MEMBER_DOES_NOT_EXIST_ERROR,
     MUST_SEND_CORRECT_AMOUNT_ETHER_ERROR,
-    PAYMENTS_V2,
-    PAYMENTS_FAIL_V2,
+    PAYMENTS_V1,
+    PAYMENTS_FAIL_V1,
     NOT_ENOUGH_ETHER_BALANCE_ERROR,
 } from '../utils/constants';
 
 import { Member, ErrorMessage } from '../types';
 
-describe('Organization Contract V2', function () {
+describe('Organization Contract V1', function () {
     let contract: ContractFactory;
     let organization: Contract;
     let address: string;
     let name: string;
     let memberCount: BigNumber;
     let balance: BigNumber | number;
-    const membersV2Accounts: string[] = MEMBERS_V2_ACCOUNTS;
-    let membersV2: Member[] = MEMBERS_V2;
-    let memberV2: Member = MEMBERS_V2[0];
+    const membersV1Accounts: string[] = MEMBERS_V1_ACCOUNTS;
+    let membersV1: Member[] = MEMBERS_V1;
+    let memberV1: Member = MEMBERS_V1[0];
     let newMember: string = NEW_MEMBER_ACCOUNT;
-    let newMemberV2: Member = NEW_MEMBER_V2;
+    let newMemberV1: Member = NEW_MEMBER_V1;
     let owner: string;
     let controller: string;
     let signer: string;
@@ -41,19 +41,19 @@ describe('Organization Contract V2', function () {
     // Checkout https://github.com/NomicFoundation/hardhat-boilerplate/blob/d3d81691855e6666fcdac90dbdd28f349ec68597/test/Token.js#L25
     // NOTE: Before all tests, deploy the contract and get the contract instance
     this.beforeAll(async () => {
-        contract = await ethers.getContractFactory(ORGANIZATION_CONTRACT_V2);
+        contract = await ethers.getContractFactory(ORGANIZATION_CONTRACT_V1);
         const encodedOrganizationDeploymentData = [
             ORGANIZATION_NAME_TEST,
-            membersV2,
+            membersV1,
         ];
         organization = await contract.deploy(
             ORGANIZATION_NAME_TEST,
-            membersV2Accounts,
+            membersV1Accounts,
             // encodeOrganizationDeploymentData,
             { value: ORGANIZATION_DEPOSIT_TEST, gasLimit: 10000000 }
         );
-        membersV2 = await organization.getMembersV2();
-        memberCount = await organization.getMemberCountV2();
+        membersV1 = await organization.getMembersV1();
+        memberCount = await organization.getMemberCountV1();
         address = organization.address;
         name = await organization.name();
         balance = await organization.getBalance();
@@ -89,7 +89,7 @@ describe('Organization Contract V2', function () {
     describe('Members', function () {
         it('Should have the correct member count', async function () {
             let expectedCorrectMemberCount = 5;
-            const actualMemberCount = await organization.getMemberCountV2();
+            const actualMemberCount = await organization.getMemberCountV1();
             expect(actualMemberCount.toNumber()).equal(
                 expectedCorrectMemberCount
             );
@@ -97,23 +97,23 @@ describe('Organization Contract V2', function () {
 
         it('Should get all members accounts', async function () {
             let expectedCorrectMemberCount = 5;
-            const orgMembers: string[] = await organization.getMembersV2();
+            const orgMembers: string[] = await organization.getMembersV1();
             expect(orgMembers.length).equal(expectedCorrectMemberCount);
             expect(memberCount.toNumber()).equal(orgMembers.length);
         });
 
         it('Should get a member', async function () {
-            const getMember: Member = await organization.getMemberV2(
-                memberV2.account
+            const getMember: Member = await organization.getMemberV1(
+                memberV1.account
             );
-            expect(getMember.account).equal(memberV2.account);
+            expect(getMember.account).equal(memberV1.account);
         });
 
         it('Should add a member', async function () {
             let expectedCorrectMemberCount = 6;
-            const before_add_members = await organization.getMembersV2();
-            await organization.addMemberV2(newMemberV2.account);
-            const after_add_members = await organization.getMembersV2();
+            const before_add_members = await organization.getMembersV1();
+            await organization.addMemberV1(newMemberV1.account);
+            const after_add_members = await organization.getMembersV1();
 
             expect(before_add_members.length).equal(
                 expectedCorrectMemberCount - 1
@@ -121,18 +121,18 @@ describe('Organization Contract V2', function () {
             expect(after_add_members.length).equal(expectedCorrectMemberCount);
             expect(
                 after_add_members[after_add_members.length - 1].account
-            ).equal(newMemberV2.account);
+            ).equal(newMemberV1.account);
         });
 
         it('Should remove a member', async function () {
             let expectedCorrectMemberCount = 5;
-            const before_remove_members = await organization.getMembersV2();
+            const before_remove_members = await organization.getMembersV1();
 
-            await organization.removeMemberV2(MEMBERS_V2_ACCOUNTS[2]);
+            await organization.removeMemberV1(MEMBERS_V1_ACCOUNTS[2]);
 
-            const after_remove_members = await organization.getMembersV2();
-            const getMember = await organization.getMemberV2(
-                MEMBERS_V2_ACCOUNTS[2]
+            const after_remove_members = await organization.getMembersV1();
+            const getMember = await organization.getMemberV1(
+                MEMBERS_V1_ACCOUNTS[2]
             );
 
             expect(before_remove_members.length).equal(
@@ -145,13 +145,13 @@ describe('Organization Contract V2', function () {
                 before_remove_members.length - 1
             );
             expect(after_remove_members[2].account).equal(
-                NEW_MEMBER_V2.account
+                NEW_MEMBER_V1.account
             );
             expect(getMember.account).equal(ADDRESS_ZERO);
         });
 
         it('Should not find a random member', async function () {
-            const getMember = await organization.getMemberV2(
+            const getMember = await organization.getMemberV1(
                 RANDOM_MEMBER_ACCOUNT
             );
             expect(getMember.account).equal(ADDRESS_ZERO);
@@ -163,7 +163,7 @@ describe('Organization Contract V2', function () {
             const member = newMember;
             const amount = ethers.utils.parseEther('1');
             const balanceBefore = await organization.getBalance();
-            await organization.payMemberV2(member, amount);
+            await organization.payMemberV1(member, amount);
             const balanceAfter = await organization.getBalance();
             expect(balanceBefore.sub(balanceAfter)).equal(amount);
         });
@@ -172,7 +172,7 @@ describe('Organization Contract V2', function () {
             const amount = ethers.utils.parseEther('1');
             const balanceBefore = await organization.getBalance();
             try {
-                await organization.payMemberV2(RANDOM_MEMBER_ACCOUNT, amount);
+                await organization.payMemberV1(RANDOM_MEMBER_ACCOUNT, amount);
             } catch (error) {
                 const balanceAfter = await organization.getBalance();
                 expect((error as ErrorMessage).message).equal(
@@ -187,7 +187,7 @@ describe('Organization Contract V2', function () {
             const amount = ethers.utils.parseEther('100');
             const balanceBefore = await organization.getBalance();
             try {
-                await organization.payMemberV2(member, amount);
+                await organization.payMemberV1(member, amount);
             } catch (error) {
                 const balanceAfter = await organization.getBalance();
                 expect((error as ErrorMessage).message).equal(
@@ -200,7 +200,7 @@ describe('Organization Contract V2', function () {
         it('Should pay list of members', async function () {
             const balance = await organization.getBalance();
             try {
-                const encodedPaymentsObjects = PAYMENTS_V2.map((payment) => {
+                const encodedPaymentsObjects = PAYMENTS_V1.map((payment) => {
                     return utils.defaultAbiCoder.encode(
                         ['address', 'uint256'],
                         [payment.to, payment.amount]
@@ -210,13 +210,13 @@ describe('Organization Contract V2', function () {
                     ['bytes[]'],
                     [encodedPaymentsObjects]
                 );
-                const tx = await organization.payMembersV2(encodedPayments);
+                const tx = await organization.payMembersV1(encodedPayments);
                 const result = await tx.wait();
                 // NOTE
                 // it should emit PAYMENTS_V2.length + 1 events.
                 // 1 for the PayMembersV2 event and 1 for each PayMemberV2 event
-                const expectedEventsCount = PAYMENTS_V2.length + 1;
-                expect(result.logs.length).equal(PAYMENTS_V2.length + 1);
+                const expectedEventsCount = PAYMENTS_V1.length + 1;
+                expect(result.logs.length).equal(PAYMENTS_V1.length + 1);
             } catch (error) {
                 throw error;
             }
@@ -226,7 +226,7 @@ describe('Organization Contract V2', function () {
         it('Should not pay list of members', async function () {
             const balance = await organization.getBalance();
             try {
-                const encodedPaymentsObjects = PAYMENTS_FAIL_V2.map(
+                const encodedPaymentsObjects = PAYMENTS_FAIL_V1.map(
                     (payment) => {
                         return utils.defaultAbiCoder.encode(
                             ['address', 'uint256'],
@@ -238,7 +238,7 @@ describe('Organization Contract V2', function () {
                     ['bytes[]'],
                     [encodedPaymentsObjects]
                 );
-                const tx = await organization.payMembersV2(encodedPayments);
+                const tx = await organization.payMembersV1(encodedPayments);
             } catch (error) {
                 expect((error as ErrorMessage).message).equal(
                     NOT_ENOUGH_ETHER_BALANCE_ERROR

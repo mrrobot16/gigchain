@@ -17,46 +17,46 @@ export const RANDOM_MEMBER_ACCOUNT =
 
 const BALANCE_ZERO = ethers.utils.parseEther('0');
 
-const Member1_V2 = {
+const Member1_V1 = {
     account: MEMBER_1_ACCOUNT,
     balance: BALANCE_ZERO,
     exists: true,
     active: true,
 };
 
-const Member2_V2 = {
+const Member2_V1 = {
     account: MEMBER_2_ACCOUNT,
     balance: BALANCE_ZERO,
     exists: true,
     active: true,
 };
 
-const Member3_V2 = {
+const Member3_V1 = {
     account: MEMBER_3_ACCOUNT,
     balance: BALANCE_ZERO,
     exists: true,
     active: true,
 };
 
-const Member4_V2 = {
+const Member4_V1 = {
     account: MEMBER_4_ACCOUNT,
     balance: BALANCE_ZERO,
     exists: true,
     active: true,
 };
 
-export const NEW_MEMBER_V2 = {
+export const NEW_MEMBER_V1 = {
     account: NEW_MEMBER_ACCOUNT,
     balance: BALANCE_ZERO,
     exists: true,
     active: true,
 };
 
-export const MEMBERS_V2 = [Member1_V2, Member2_V2, Member3_V2, Member4_V2];
+export const MEMBERS_V1 = [Member1_V1, Member2_V1, Member3_V1, Member4_V1];
 
-export const MEMBERS_V2_ACCOUNTS = [
-    Member1_V2.account,
-    Member2_V2.account,
-    Member3_V2.account,
-    Member4_V2.account,
+export const MEMBERS_V1_ACCOUNTS = [
+    Member1_V1.account,
+    Member2_V1.account,
+    Member3_V1.account,
+    Member4_V1.account,
 ];
