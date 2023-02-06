@@ -1,23 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 // import "hardhat/console.sol";
+import "./common/Validations.sol";
+import "./common/Governable.sol";
+import "./models/Member.sol";
+import "./models/Payment.sol";
 
-struct Member {
-    address account;
-    uint256 balance;
-    bool exists;
-    bool active; // This could be useful to check if a member is active or not to determine if should be paid.
-}
-
-struct Payment {
-    address to;
-    uint256 amount;
-    uint256 timestamp;
-}
-
-contract OrganizationV1 {
-    address public owner;
-    address public controller;
+contract OrganizationV1 is Governable, Validations {
     string public name;
     address[] public membersAccounts;
     uint256 public memberCount;
@@ -37,14 +26,16 @@ contract OrganizationV1 {
     }
 
     constructor(string memory _name, address[] memory _members) payable {
-        owner = msg.sender;
-        controller = msg.sender;
+        initializeGovernable();
         name = _name;
         addMembers(_members);
-        addMember(controller);
+        addMember(controller());
     }
 
-    function addMembers(address[] memory _members) public onlyController("addMembers") {
+    function addMembers(address[] memory _members) 
+    public 
+    onlyController("addMembers") 
+    {
         for (uint i = 0; i < _members.length; i++) {
             addMember(_members[i]);
         }
@@ -130,24 +121,30 @@ contract OrganizationV1 {
         return membersArray;
     }
 
-    function getMemberCount() public view returns (uint256) {
+    function getMemberCount() 
+    public 
+    view 
+    returns (uint256) 
+    {
         return memberCount;
     }
 
-    function getMember(address account) public view returns (Member memory) {
+    function getMember(address account) 
+    public 
+    view 
+    returns (Member memory) 
+    {
         return members[account];
     }
 
-    function getBalance() public view returns (uint256) {
+    function getBalance() 
+    public 
+    view 
+    returns (uint256) 
+    {
         return address(this).balance;
     }
 
-    function transferControllership(address newController) public onlyOwner("transferControllership") {
-        controller = newController;
-    }
-
-
-    
     modifier mustExistMember(address _member) {
         require(members[_member].exists == true, "Member does not exist");
         _;
@@ -158,40 +155,4 @@ contract OrganizationV1 {
         _;
     }
     
-    modifier memberMustExist(address _member) {
-        require(getMember(_member).account != address(0), "Member does not exist");
-        _;
-    }
-
-    modifier onlyOwner(string memory functionName) {
-        string memory message = string(abi.encodePacked("Only the owner can call: ", functionName));
-        require(msg.sender == owner, message);
-        _;
-    }
-
-    modifier mustSendEther(uint _amount) {
-        require(_amount > 0, "You must send some Ether");
-        _;
-    }
-
-    modifier correctAmount(uint _amount) {
-        uint256 balance = address(this).balance;
-        require(_amount <= balance, "You must send the correct amount of Ether");
-        _;
-    }
-
-    modifier correctAmounts(uint256[] memory _amounts) {
-        uint256 total = 0;
-        for (uint i = 0; i < _amounts.length; i++) {
-            total += _amounts[i];
-        }
-        require(total <= address(this).balance, "You must send the correct amount of Ether");
-        _;
-    }
-
-    modifier onlyController(string memory functionName) {
-        string memory message = string(abi.encodePacked("Only the controller can call: ", functionName));
-        require(msg.sender == controller, message);
-        _;
-    }
 }
