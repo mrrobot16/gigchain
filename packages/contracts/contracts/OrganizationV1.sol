@@ -33,8 +33,8 @@ contract OrganizationV1 is Governable, Validations {
     }
 
     function addMembers(address[] memory _members) 
-    public 
-    onlyController("addMembers") 
+        public 
+        onlyController("addMembers") 
     {
         for (uint i = 0; i < _members.length; i++) {
             addMember(_members[i]);
@@ -122,25 +122,25 @@ contract OrganizationV1 is Governable, Validations {
     }
 
     function getMemberCount() 
-    public 
-    view 
-    returns (uint256) 
+        public 
+        view 
+        returns (uint256) 
     {
         return memberCount;
     }
 
     function getMember(address account) 
-    public 
-    view 
-    returns (Member memory) 
+        public 
+        view 
+        returns (Member memory) 
     {
         return members[account];
     }
 
     function getBalance() 
-    public 
-    view 
-    returns (uint256) 
+        public 
+        view 
+        returns (uint256) 
     {
         return address(this).balance;
     }
