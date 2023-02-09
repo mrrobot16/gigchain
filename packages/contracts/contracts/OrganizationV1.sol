@@ -12,6 +12,7 @@ contract OrganizationV1 is Governable, Validations {
     uint256 public memberCount;
     mapping(address => Member) public members;
     Payment[] public payments;
+    Member[] public membersArr;
 
     event Transfer(address indexed from, address indexed to, uint256 value);
     event MultiTransfer(address indexed from, address[] indexed to, uint256 value);
