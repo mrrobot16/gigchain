@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import { AddCircle as AddCircleIcon  } from '@mui/icons-material';
 
-import { Web3 } from "services/web3";
+import { Web3 } from "services/web3/v1";
 import { Member } from "types"
 import { MemberList } from "components";
 import { convertToArrayOfAddresses } from "utils";
@@ -76,7 +76,7 @@ function CreateOrganizationForm() {
   const deployOrgContract = async () => {
     try {
       const web3 = await Web3.getInstance();
-      await web3.deployOrgContract(
+      await web3.deployOrgContractV1(
         name, 
         convertToArrayOfAddresses(members), 
         0.00018, // this should be a constant or user input
