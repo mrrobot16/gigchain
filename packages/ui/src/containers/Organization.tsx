@@ -4,7 +4,7 @@ import  { Container, Box, Typography, Button } from "@mui/material";
 import { useParams  } from "react-router-dom";
 import { BigNumber } from "ethers";
 
-import { Web3 } from "services/web3";
+import { Web3 } from "services/web3/v1";
 import { DashboardMemberList } from "components";
 import { Member } from "types";
 import { 
@@ -26,9 +26,9 @@ function Organization() {
   
   const componentDidMount = async (): Promise<void> => {
     const web3 = await Web3.getInstance();
-    const getOrgMembers = await web3?.getOrgMembers(organization);
+    const getOrgMembers = await web3?.getOrgMembersV1(organization);    
     if (getOrgMembers != undefined) setMembers(getOrgMembers);
-    const getOrgBalance = await web3?.getOrgBalance(organization);
+    const getOrgBalance = await web3?.getOrgBalanceV1(organization);
     if (getOrgBalance != undefined) setOrgBalance(getOrgBalance);
   }
 
@@ -44,7 +44,7 @@ function Organization() {
     const web3 = await Web3.getInstance();
     console.log('payMember member', member);
     console.log('payMember amount', amount);
-    await web3.payOrgMember(organization, member, amount);
+    await web3.payOrgMemberV1(organization, member, amount);
   }
 
   const payMembers = async ()  => {
@@ -55,7 +55,7 @@ function Organization() {
     }
     console.log('PAYROLL', PAYROLL);
     const web3 = await Web3.getInstance();
-    await web3.payOrgMembers(organization, PAYROLL.members, PAYROLL.amounts);
+    await web3.payOrgMembersV1(organization, PAYROLL.members, PAYROLL.amounts);
   }
 
   const addMember = (member?: string)  => {

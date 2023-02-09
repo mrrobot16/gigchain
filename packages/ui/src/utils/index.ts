@@ -7,3 +7,12 @@ export function convertToArrayOfAddresses(members: Member[]) {
 export function convertToArrayOfAmounts(members: Member[]) {
   return members.map((member: Member) => member.amount.toString());
 }
+
+export function convertMembersToArrayOfObject(members: []) {
+  // console.log('members: ', members);
+  
+  members.map((member, index) => {
+    return 
+      member
+  });
+}
