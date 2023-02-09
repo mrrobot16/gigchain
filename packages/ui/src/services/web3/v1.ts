@@ -73,13 +73,9 @@ export class Web3 {
   public async getOrgMembersV1(orgContractAddress: string) {
     console.log('Getting Org Members...');
     const contract = new ethers.Contract(orgContractAddress, OrganizationABI.abi, this.signer);    
-    console.log('asdsad');
-    console.log(ethereum?.selectedAddress);
-    
+
     if(ethereum?.selectedAddress != null) {
       try {
-        console.log('asd');
-        
         const members = await contract.getMembers();
         console.log('members: ', members);
         
