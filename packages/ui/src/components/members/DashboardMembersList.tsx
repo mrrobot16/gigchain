@@ -33,8 +33,8 @@ export const DashboardMemberList = ({members, onRemoveMember, onPayMember, setPa
 
           const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
             const value = parseInt(event.target.value);
-            setAmount(value);
-            const sanitizedPayments  = sanitizePayments(payments, member.address, amount);
+            setAmount(value);            
+            const sanitizedPayments  = sanitizePayments(payments, member.address, value);
             setPayments(sanitizedPayments)
           }
 
