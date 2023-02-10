@@ -7,6 +7,11 @@ export interface Member {
   active?: boolean;
 }
 
+export interface Payment {
+  to: string;
+  amount: number | string | BigNumber;
+}
+
 export declare interface EthereumWindowProvider {
   selectedAddress: string;
   enable(): Promise<void>;
