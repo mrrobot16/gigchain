@@ -4,9 +4,10 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material/styles";
 
 import { MUItheme } from "styles/theme";
+import { appStyles } from "styles/app";
 function App() {
   return (
-    <div style={{backgroundColor: "#0d0208bd", color: "#003B00"}}>
+    <div style={appStyles}>
       <CssBaseline />
         {/* <WagmiConfig client={client}> */}
           <ThemeProvider theme={MUItheme}>
