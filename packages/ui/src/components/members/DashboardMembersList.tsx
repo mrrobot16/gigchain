@@ -10,50 +10,46 @@ import {
 } from "@mui/material";
 import { RemoveCircle as RemoveCircleIcon,  CurrencyBitcoin } from '@mui/icons-material';
 
-import { Member } from "types"
+import { Member, Payment } from "types"
+import { sanitizePayments } from "utils";
 
 interface DashboardMemberListProps {
-  members: Member[] | string[],
+  members: Member[],
   onRemoveMember: (member: string | number) => void
   onPayMember: (member: string, amount: number) => void
-  membersToPay: Member[] | string[],
-  setMembersToPay: (members: Member[]) => void;
+  payments: Payment[],
+  setPayments: (members: Payment[]) => void;
 }
 
-export const DashboardMemberList = ({members, onRemoveMember, onPayMember, setMembersToPay, membersToPay}: DashboardMemberListProps) => {
+export const DashboardMemberList = ({members, onRemoveMember, onPayMember, setPayments, payments}: DashboardMemberListProps) => {
   return (
     <List>
       <Typography variant="h5" align="center">
         List of Members
       </Typography>
       {
-        members.map((item, index) => {
+        members.map((member, index) => {
           const [amount, setAmount] = React.useState(0);
 
           const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-            const newMember: Member = {
-              address: typeof item == "string" ? item : item.address,
-              amount: parseInt(event.target.value),
-            }
-            setAmount(
-              parseInt(event.target.value)
-            );
-            setMembersToPay([
-              ...membersToPay as Member[],
-              newMember
-            ]);
+            const value = parseInt(event.target.value);
+            setAmount(value);
+            const sanitizedPayments  = sanitizePayments(payments, member.address, amount);
+            setPayments(sanitizedPayments)
           }
+
           const onClickPayMember = () => {
-            onPayMember(typeof item == "string" ? item : item.address, amount);
+            if(amount == 0) return;
+            onPayMember(member.address, amount);
           }
 
           const onClickRemoveMember = () => {
-            onRemoveMember(typeof item == "string" ? item : item.address);
+            onRemoveMember(member.address);
           }
 
           return (
             <ListItem key={index}>
-              <ListItemText primary={typeof item == "string" ? item.slice(0,20) : item.address} />
+              <ListItemText primary={member.address} />
               <TextField inputProps={{ inputMode: 'numeric' }} type="number" onChange={onChange}/>
               <ListItemIcon onClick={onClickPayMember}>
                 <CurrencyBitcoin/>

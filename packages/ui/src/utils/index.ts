@@ -1,3 +1,5 @@
+export * from './abiCoder';
+export * from './payments';
 import { Member } from 'types';
 
 export function convertToArrayOfAddresses(members: Member[]) {
