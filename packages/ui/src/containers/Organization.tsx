@@ -19,17 +19,17 @@ function Organization() {
   const [orgMembers, setMembers] = useState<Member[]>([]);
   const [orgBalance, setOrgBalance] = useState<BigNumber | undefined>(undefined);
   const [payments, setPayments] = useState<Payment[]>([]);
-  const [payingMembers, setPayingMembers] = useState(false);
+  const [disableButtons, setDisableButtons] = useState(false);
   
   const componentDidMount = async (): Promise<void> => {
-    resetOrgInfo();
+    setOrgInfo();
   }
 
-  const resetOrgInfo = async () => {
-    const web3 = await Web3.getInstance();
-    const getOrgMembers = await web3?.getOrgMembersV1(organization);    
+  const setOrgInfo = async () => {
+    const web3 = await Web3.getInstance(organization);
+    const getOrgMembers = await web3?.getOrgMembersV1();    
     if (getOrgMembers != undefined) setMembers(getOrgMembers);
-    const getOrgBalance = await web3?.getOrgBalanceV1(organization);
+    const getOrgBalance = await web3?.getOrgBalanceV1();
     if (getOrgBalance != undefined) setOrgBalance(getOrgBalance);
   }
 
@@ -42,21 +42,25 @@ function Organization() {
   }
 
   const payMember = async (member: string, amount: BigNumber | number)  => {    
-    const web3 = await Web3.getInstance();
+    const web3 = await Web3.getInstance(organization);
     console.log('payMember member', member);
     console.log('payMember amount', amount);
-    await web3.payOrgMemberV1(organization, member, amount);
+    const tx = await web3.payOrgMemberV1(member, amount);
+    setDisableButtons(true);
+    await tx.wait();
+    setDisableButtons(false);
+    setOrgInfo();
   }
 
   const payMembers = async ()  => {
     if(payments.length <= (orgMembers).length && payments.length > 0) {
       console.log("IS possible to make payments: ", payments);
-      const web3 = await Web3.getInstance();
-      const tx = await web3.payOrgMembersV1(organization, payments);
-      setPayingMembers(true)
+      const web3 = await Web3.getInstance(organization);
+      const tx = await web3.payOrgMembersV1(payments);
+      setDisableButtons(true);
       await tx.wait();
-      resetOrgInfo();
-      setPayingMembers(false)
+      setOrgInfo();
+      setDisableButtons(false);
     } else {
       console.log('NOT possible to make payments:', payments);
     }
@@ -94,13 +98,13 @@ function Organization() {
         />
 
         <div>
-          <Button variant="contained" color="primary" sx={buttonStyle} onClick={()=>{ payMembers() }} disabled={payingMembers}>
-            { payingMembers ? 'Paying members...' : 'Pay Members' }
+          <Button variant="contained" color="primary" sx={buttonStyle} onClick={()=>{ payMembers() }} disabled={disableButtons}>
+            { disableButtons ? 'Paying members...' : 'Pay Members' }
           </Button>
         </div>
 
         <div>
-          <Button variant="contained" color="primary" sx={buttonStyle} onClick={()=>{ addMember() }}>
+          <Button variant="contained" color="primary" sx={buttonStyle} onClick={()=>{ addMember() }} disabled={disableButtons}>
             Add Member
           </Button>
         </div>
