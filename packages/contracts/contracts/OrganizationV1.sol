@@ -8,11 +8,8 @@ import "./models/Payment.sol";
 
 contract OrganizationV1 is Governable, Validations {
     string public name;
-    address[] public membersAccounts;
-    uint256 public memberCount;
-    mapping(address => Member) public members;
     Payment[] public payments;
-    Member[] public membersArr;
+    Member[] public members;
 
     event Transfer(address indexed from, address indexed to, uint256 value);
     event MultiTransfer(address indexed from, address[] indexed to, uint256 value);
@@ -46,12 +43,10 @@ contract OrganizationV1 is Governable, Validations {
         public 
         onlyController("addMember") 
         mustNotExistMember(account)
-    {
+    {   
         Member memory member = Member(account, 0, true, true);
-        members[account] = member;
-        membersAccounts.push(account);
-        memberCount++;
-        emit AddMember(members[account].account);
+        members.push(member);
+        emit AddMember(member.account);
     }
 
     function removeMember(address account) 
@@ -59,13 +54,10 @@ contract OrganizationV1 is Governable, Validations {
         onlyController("removeMember")
         mustExistMember(account)
     {
-        members[account].exists = false;
-        delete(members[account]);
-        memberCount--;
-        for (uint i = 0; i < membersAccounts.length; i++) {
-            if (membersAccounts[i] == account) {
-                membersAccounts[i] = membersAccounts[membersAccounts.length - 1];
-                membersAccounts.pop();
+        for (uint i = 0; i < members.length; i++) {
+            if (members[i].account == account) {
+                members[i] = members[members.length - 1];
+                members.pop();
                 emit RemoveMember(account);
                 break;
             }
@@ -111,15 +103,7 @@ contract OrganizationV1 is Governable, Validations {
         view
         returns (Member[] memory)
     {
-        Member[] memory membersArray = new Member[](memberCount);
-        uint256 index = 0;
-        for (uint i = 0; i < membersArray.length; i++) {
-            if (members[membersAccounts[i]].exists) {
-                membersArray[index] = members[membersAccounts[i]];
-                index++;
-            }
-        }
-        return membersArray;
+        return members;
     }
 
     function getMemberCount() 
@@ -127,7 +111,7 @@ contract OrganizationV1 is Governable, Validations {
         view 
         returns (uint256) 
     {
-        return memberCount;
+        return members.length;
     }
 
     function getMember(address account) 
@@ -135,7 +119,13 @@ contract OrganizationV1 is Governable, Validations {
         view 
         returns (Member memory) 
     {
-        return members[account];
+        // return membersArr[account];
+        for(uint i = 0; i < members.length; i++) {
+            if (members[i].account == account) {
+                return members[i];
+            }
+        }
+        return Member(address(0), 0, false, false);
     }
 
     function getBalance() 
@@ -146,14 +136,15 @@ contract OrganizationV1 is Governable, Validations {
         return address(this).balance;
     }
 
-    modifier mustExistMember(address _member) {
-        require(members[_member].exists == true, "Member does not exist");
+    modifier mustExistMember(address account) {
+        require(getMember(account).account == account, "Member does not exist");
+        // require(members[_member].exists == true, "Member does not exist");
         _;
     }
 
     modifier mustNotExistMember(address account) {
-        require(members[account].exists == false, "Member already exists");
+        require(getMember(account).exists == false, "Member already exists");
         _;
     }
-    
+
 }
