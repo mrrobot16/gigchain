@@ -6,11 +6,7 @@ import { BigNumber } from "ethers";
 
 import { Web3 } from "services/web3/v1";
 import { DashboardMemberList } from "components";
-import { Member } from "types";
-import { 
-  convertToArrayOfAddresses,
-  convertToArrayOfAmounts, 
-} from "utils";
+import { Member, Payment } from "types";
 
 const buttonStyle = {
   width: "50%",
@@ -20,11 +16,16 @@ const buttonStyle = {
 function Organization() {
   const params = useParams();
   const organization = params.address as (`0x${string}`);
-  const [orgMembers, setMembers] = useState<Member[] | string[]>([]);
+  const [orgMembers, setMembers] = useState<Member[]>([]);
   const [orgBalance, setOrgBalance] = useState<BigNumber | undefined>(undefined);
-  const [membersToPay, setMembersToPay] = useState<Member[]>([]);
+  const [payments, setPayments] = useState<Payment[]>([]);
+  const [payingMembers, setPayingMembers] = useState(false);
   
   const componentDidMount = async (): Promise<void> => {
+    resetOrgInfo();
+  }
+
+  const resetOrgInfo = async () => {
     const web3 = await Web3.getInstance();
     const getOrgMembers = await web3?.getOrgMembersV1(organization);    
     if (getOrgMembers != undefined) setMembers(getOrgMembers);
@@ -48,14 +49,17 @@ function Organization() {
   }
 
   const payMembers = async ()  => {
-    // PayMembers expect an array of addresses and an array of amounts.
-    const PAYROLL = {
-      members: convertToArrayOfAddresses(membersToPay),
-      amounts: convertToArrayOfAmounts(membersToPay),
+    if(payments.length <= (orgMembers).length && payments.length > 0) {
+      console.log("IS possible to make payments: ", payments);
+      const web3 = await Web3.getInstance();
+      const tx = await web3.payOrgMembersV1(organization, payments);
+      setPayingMembers(true)
+      await tx.wait();
+      resetOrgInfo();
+      setPayingMembers(false)
+    } else {
+      console.log('NOT possible to make payments:', payments);
     }
-    console.log('PAYROLL', PAYROLL);
-    const web3 = await Web3.getInstance();
-    await web3.payOrgMembersV1(organization, PAYROLL.members, PAYROLL.amounts);
   }
 
   const addMember = (member?: string)  => {
@@ -85,13 +89,13 @@ function Organization() {
           } 
           onRemoveMember={removeMember} 
           onPayMember={payMember}
-          setMembersToPay={setMembersToPay}
-          membersToPay={membersToPay}
+          setPayments={setPayments}
+          payments={payments}
         />
 
         <div>
-          <Button variant="contained" color="primary" sx={buttonStyle} onClick={()=>{ payMembers() }}>
-            Pay Members
+          <Button variant="contained" color="primary" sx={buttonStyle} onClick={()=>{ payMembers() }} disabled={payingMembers}>
+            { payingMembers ? 'Paying members...' : 'Pay Members' }
           </Button>
         </div>
 
