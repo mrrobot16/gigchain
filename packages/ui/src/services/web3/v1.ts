@@ -1,12 +1,12 @@
 import { Signer, ContractFactory, ethers, BigNumber, providers } from 'ethers';
 
 import OrganizationABI from 'services/web3/abis/OrganizationV1.json';
-import { Member, Ethereum } from 'types';
-import { convertMembersToArrayOfObject } from 'utils';
+import { Member, EthereumWindowProvider } from 'types';
+import { convertMembersArrayToArrayOfObject } from 'utils';
 
 const { REACT_APP_NETWORK: NETWORK } = process.env;
 
-const ethereum = (window).ethereum as Ethereum;
+const ethereum = (window).ethereum as (providers.ExternalProvider & EthereumWindowProvider);
 
 export class Web3 {
   private static _instance: Web3;
@@ -24,8 +24,12 @@ export class Web3 {
 
   private async initialize() {
     Web3.initialized = true;
-    const provider = new ethers.providers.Web3Provider(ethereum as providers.ExternalProvider);
-    this.signer = provider.getSigner();
+    try {
+      const provider = new ethers.providers.Web3Provider(ethereum as providers.ExternalProvider);
+      this.signer = provider.getSigner();
+    } catch (error) {
+      throw 'Web3.initialize() error: ' + error;
+    }
   }
 
   public async deployOrgContractV1(
@@ -77,10 +81,7 @@ export class Web3 {
     if(ethereum?.selectedAddress != null) {
       try {
         const members = await contract.getMembers();
-        console.log('members: ', members);
-        
-        console.log('members: ', convertMembersToArrayOfObject(members));
-        return members;
+        return convertMembersArrayToArrayOfObject(members);
       } catch (error) {
         console.log('Error getting org members: ', error);
         return [];
@@ -88,7 +89,7 @@ export class Web3 {
     } else {
       await ethereum?.enable();
       const members = await contract.getMembers();
-      return members;
+      return convertMembersArrayToArrayOfObject(members);
     }
   }
 
