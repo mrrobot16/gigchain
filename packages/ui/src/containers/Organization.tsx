@@ -26,9 +26,9 @@ function Organization() {
   
   const componentDidMount = async (): Promise<void> => {
     const web3 = await Web3.getInstance();
-    const getOrgMembers = await web3.getOrgMembersV1(organization);    
+    const getOrgMembers = await web3?.getOrgMembersV1(organization);    
     if (getOrgMembers != undefined) setMembers(getOrgMembers);
-    const getOrgBalance = await web3.getOrgBalanceV1(organization);
+    const getOrgBalance = await web3?.getOrgBalanceV1(organization);
     if (getOrgBalance != undefined) setOrgBalance(getOrgBalance);
   }
 
