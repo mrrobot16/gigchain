@@ -1,8 +1,8 @@
-import { Signer, ContractFactory, ethers, BigNumber, providers } from 'ethers';
+import { Signer, ContractFactory, ethers, BigNumber, providers, Contract } from 'ethers';
 
 import OrganizationABI from 'services/web3/abis/OrganizationV1.json';
-import { Member, EthereumWindowProvider } from 'types';
-import { convertMembersArrayToArrayOfObject } from 'utils';
+import { Member, EthereumWindowProvider, Payment } from 'types';
+import { convertMembersArrayToArrayOfObject, encodePayments } from 'utils';
 
 const { REACT_APP_NETWORK: NETWORK } = process.env;
 
@@ -12,21 +12,25 @@ export class Web3 {
   private static _instance: Web3;
   private static initialized = false;
   private signer: providers.JsonRpcProvider | Signer | undefined = new providers.JsonRpcProvider();
-  public static async getInstance(): Promise<Web3> {
+  private contract: Contract = new Contract("", OrganizationABI.abi, this.signer);
+  public static async getInstance(address: string | null = null): Promise<Web3> {
     if (!this.initialized) {
       const instance = new Web3();
-      await instance.initialize();
+      await instance.initialize(address);
       this._instance = instance;
       console.log('Web3 service instance has been initialized...');
     }
     return this._instance;
   }
 
-  private async initialize() {
+  private async initialize(address: string | null = null) {
     Web3.initialized = true;
     try {
       const provider = new ethers.providers.Web3Provider(ethereum as providers.ExternalProvider);
       this.signer = provider.getSigner();
+      if(address != null) {
+        this.contract = new Contract(address as string, OrganizationABI.abi, this.signer);
+      }
     } catch (error) {
       throw 'Web3.initialize() error: ' + error;
     }
@@ -38,7 +42,6 @@ export class Web3 {
     depositAmount = 0.0001888, 
     callback?: (address: string) => void,
   ) {
-    console.log("members: ", members);
     console.log('Deploying Org Contract... please confirm transaction in MetaMask.');
     const contract  = new ContractFactory(OrganizationABI.abi, OrganizationABI.bytecode, this.signer as Signer);
     const txConfig = {
@@ -74,13 +77,11 @@ export class Web3 {
     callback != undefined ? callback(deployedOrgContractAddress as string) : null;
   }
 
-  public async getOrgMembersV1(orgContractAddress: string) {
+  public async getOrgMembersV1() {
     console.log('Getting Org Members...');
-    const contract = new ethers.Contract(orgContractAddress, OrganizationABI.abi, this.signer);    
-
     if(ethereum?.selectedAddress != null) {
       try {
-        const members = await contract.getMembers();
+        const members = await this.contract.getMembers();
         return convertMembersArrayToArrayOfObject(members);
       } catch (error) {
         console.log('Error getting org members: ', error);
@@ -88,47 +89,42 @@ export class Web3 {
       }
     } else {
       await ethereum?.enable();
-      const members = await contract.getMembers();
+      const members = await this.contract.getMembers();
       return convertMembersArrayToArrayOfObject(members);
     }
   }
 
-  public async getOrgBalanceV1(orgContractAddress: string) {
+  public async getOrgBalanceV1() {
     console.log('Getting Org Balance...');
     try {
-      const contract = new ethers.Contract(orgContractAddress, OrganizationABI.abi, this.signer);
-      const balance = await contract.getBalance();
+      const balance = await this.contract.getBalance();
       return balance;
     } catch (error) {
       return 0;
     }
   }
 
-  public async payOrgMemberV1(orgContractAddress: string, member: string, amount: BigNumber | number | string) {
+  public async payOrgMemberV1(member: string, amount: BigNumber | number | string) {
     console.log(`Pay Org Member: ${member} amount: ${amount}`);
-    const contract = new ethers.Contract(orgContractAddress, OrganizationABI.abi, this.signer);
-    const tx = await contract.payMember(member, amount, { gasLimit: 1000000 });
+    const tx = await this.contract.payMember(member, amount, { gasLimit: 1000000 });
     return tx;
   }
 
-  public async payOrgMembersV1(orgContractAddress: string, members: string[] | Member[], amounts: BigNumber[] | number[] | string[] | undefined) {
-    console.log(`Pay Org Members: ${members} amount: ${amounts}`);
-    const contract = new ethers.Contract(orgContractAddress, OrganizationABI.abi, this.signer);
-    const tx = await contract.payMembers(members, amounts, { gasLimit: 1000000 });
+  public async payOrgMembersV1(payments: Payment[]) {
+    console.log(`PayOrgMembers Payments: `, payments);
+    const tx = await this.contract.payMembers(encodePayments(payments), { gasLimit: 1000000 });
     return tx;
   }
 
-  public async addOrgMemberV1(orgContractAddress: string, member: string) {
+  public async addOrgMemberV1(member: string) {
     console.log(`Add Org Member: ${member}`);
-    const contract = new ethers.Contract(orgContractAddress, OrganizationABI.abi, this.signer);
-    const tx = await contract.addMember(member, { gasLimit: 1000000 });
+    const tx = await this.contract.addMember(member, { gasLimit: 1000000 });
     return tx;
   }
 
-  public async removeOrgMemberV1(orgContractAddress: string, member: string) {
+  public async removeOrgMemberV1(member: string) {
     console.log(`Remove Org Member: ${member}`);
-    const contract = new ethers.Contract(orgContractAddress, OrganizationABI.abi, this.signer);
-    const tx = await contract.removeMember(member, { gasLimit: 1000000 });
+    const tx = await this.contract.removeMember(member, { gasLimit: 1000000 });
     return tx;
   }
 }
