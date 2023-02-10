@@ -119,7 +119,6 @@ contract OrganizationV1 is Governable, Validations {
         view 
         returns (Member memory) 
     {
-        // return membersArr[account];
         for(uint i = 0; i < members.length; i++) {
             if (members[i].account == account) {
                 return members[i];
@@ -138,7 +137,6 @@ contract OrganizationV1 is Governable, Validations {
 
     modifier mustExistMember(address account) {
         require(getMember(account).account == account, "Member does not exist");
-        // require(members[_member].exists == true, "Member does not exist");
         _;
     }
 

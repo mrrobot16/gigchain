@@ -6,7 +6,7 @@
         "test": "npx hardhat test",
         "test:organizationV1": "npx hardhat test test/OrganizationV1.ts",
         "test:gas": "REPORT_GAS=true npx hardhat test",
-        "node": "npx hardhat node",
+        "local:node": "npx hardhat node",
         "hardhat:coverage": "npx hardhat coverage",
         "compile": "npx hardhat compile",
         "check": "yarn hardhat:check",
