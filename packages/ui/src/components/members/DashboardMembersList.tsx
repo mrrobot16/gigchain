@@ -15,7 +15,7 @@ import { sanitizePayments } from "utils";
 
 interface DashboardMemberListProps {
   members: Member[],
-  onRemoveMember: (member: string | number) => void
+  onRemoveMember: (member: Member) => void
   onPayMember: (member: string, amount: number) => void
   payments: Payment[],
   setPayments: (members: Payment[]) => void;
@@ -44,7 +44,7 @@ export const DashboardMemberList = ({members, onRemoveMember, onPayMember, setPa
           }
 
           const onClickRemoveMember = () => {
-            onRemoveMember(member.address);
+            onRemoveMember(member);
           }
 
           return (
