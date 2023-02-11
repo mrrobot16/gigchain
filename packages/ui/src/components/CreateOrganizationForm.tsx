@@ -61,14 +61,10 @@ function CreateOrganizationForm() {
   // }
 
   const addMember = () => {
-    console.log("add member");
-    console.log(member);
     setMembers([...members, member]);
   };
 
   const removeMember = (index: number) => {
-    console.log("remove member");
-    console.log(index);
     const newMembers = members.filter((item, i) => i !== index);
     setMembers(newMembers);
   };
@@ -76,12 +72,13 @@ function CreateOrganizationForm() {
   const deployOrgContract = async () => {
     try {
       const web3 = await Web3.getInstance();
-      await web3.deployOrgContractV1(
+      const contract = await web3.deployOrgContractV1(
         name, 
-        convertToArrayOfAddresses(members), 
-        0.00018, // this should be a constant or user input
-        callbackAfterDeployOrgContract
+        convertToArrayOfAddresses(members),
+        0.00018
       );
+      window.open(contract.url, '_blank');
+      callbackAfterDeployOrgContract(contract.address);
     } catch (error: unknown) {
       throw new Error('Possible RPC Error: Metamask Tx Signature: User denied transaction signature');
     }
