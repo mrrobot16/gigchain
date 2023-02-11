@@ -39,8 +39,7 @@ export class Web3 {
   public async deployOrgContractV1(
     name: string, 
     members: string[] | Member[], 
-    depositAmount = 0.0001888, 
-    callback?: (address: string) => void,
+    depositAmount = 0.0001888
   ) {
     console.log('Deploying Org Contract... please confirm transaction in MetaMask.');
     const contract  = new ContractFactory(OrganizationABI.abi, OrganizationABI.bytecode, this.signer as Signer);
@@ -72,9 +71,16 @@ export class Web3 {
     const receipt = await deployedOrgContract?.deployTransaction.wait();
     console.log('Contract mined successfully at block: ', receipt?.blockNumber);
     const deployedOrgContractAddress = deployed?.address
-    const contractUrl = `https://${NETWORK}.etherscan.io/address/${deployedOrgContract?.address}`;
-    window.open(contractUrl, '_blank');
-    callback != undefined ? callback(deployedOrgContractAddress as string) : null;
+    const contractExplorerUrl = `https://${NETWORK}.etherscan.io/address/${deployedOrgContract?.address}`;
+
+    return {
+      address: deployedOrgContractAddress,
+      url: contractExplorerUrl,
+      deployed,
+      receipt
+    }
+    // window.open(contractUrl, '_blank');
+    // callback != undefined ? callback(deployedOrgContractAddress as string) : null;
   }
 
   public async getOrgMembersV1() {
