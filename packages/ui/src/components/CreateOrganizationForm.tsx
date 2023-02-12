@@ -8,7 +8,6 @@ import {
   FormControl,
   FormLabel,
 } from "@mui/material";
-import { AddCircle as AddCircleIcon  } from '@mui/icons-material';
 
 import { Web3 } from "services/web3/v1";
 import { Member } from "types"
@@ -118,6 +117,7 @@ function CreateOrganizationForm() {
                   onChange={(event) => onChangeText("name", event.target.value)}
                   required={true}
                   value={name}
+                  sx={{ width: 350 }}
                 />
           </FormControl>
           
@@ -126,19 +126,25 @@ function CreateOrganizationForm() {
                     Add Member
                 </FormLabel>
                 <br/>
+                <div style={{ display: "flex" }}>
                   <TextField 
                     label="Member Address" 
                     variant="outlined" 
                     onChange={(event) => onChangeText("address", event.target.value)}
                     required={true}
                     value={member.address}
+                    sx={{ width: 350 }}
                   /> 
-                <AddCircleIcon onClick={addMember}/>
+                </div>
           </FormControl>
-          
+          <br/>
+          <Button variant="contained" color="primary" type="submit" sx={{ width: 350 }} onClick={addMember}>
+              Add Member
+          </Button>
+          <br/>
           {/* Submit */}
           <FormControl>
-              <Button variant="contained" color="primary" type="submit">
+              <Button variant="contained" color="primary" type="submit" sx={{ width: 350 }}>
                 Create Organization
               </Button>
           </FormControl>  
