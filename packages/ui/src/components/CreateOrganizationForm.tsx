@@ -1,9 +1,6 @@
 import React, { 
   useEffect 
 } from "react";
-import {
-  useNavigate
-} from "react-router-dom";
 import { 
   Box, 
   Button,
@@ -34,7 +31,6 @@ function CreateOrganizationForm() {
   const [name, setName] = React.useState<string>("");
   const [member, setMember ] = React.useState<Member>({ address: "0x5Db06acd673531218B10430bA6dE9b69913Ad545", amount: 0.00018 });
   const [members, setMembers] = React.useState<Member[]>([]);
-  const navigate = useNavigate();
 
   const onChangeText = (textField: string, input: string) => {
     switch (textField) {
@@ -85,7 +81,8 @@ function CreateOrganizationForm() {
   }
 
   const callbackAfterDeployOrgContract = (address: string) => {
-    navigate(`/org/${address}`);
+    // Using this way to navigate loads Members and Balances when a deployment is success.
+    window.open(`http://localhost:3000/org/${address}`)
   }
 
   async function onSubmit() {
