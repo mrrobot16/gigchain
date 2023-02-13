@@ -84,7 +84,7 @@ function CreateOrganizationForm() {
     window.open(`http://localhost:3000/org/${address}`)
   }
 
-  async function onSubmit() {
+  const onSubmit = async () => {
     deployOrgContract()
   }
 

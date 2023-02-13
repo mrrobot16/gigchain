@@ -20,7 +20,7 @@ export const MemberList = ({members, onRemoveMember}:{ members: Member[], onRemo
         members.map((item, index) => (
           <ListItem key={index} sx={{ paddingLeft: "unset", width: 250 }}>
               <ListItemText primary={(item as Member).address.slice(0, 15) + "..."} />
-              <ListItemIcon onClick={()=>{
+              <ListItemIcon color="inherit" onClick={()=>{
                 onRemoveMember(index);
               }}>
                 <RemoveCircleIcon/>
