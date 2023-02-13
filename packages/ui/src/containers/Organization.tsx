@@ -25,13 +25,17 @@ function Organization() {
     amount: 0,
   });
   
-  const componentDidMount = async (): Promise<void> => {
+  const componentDidMount = () => {
     setOrgInfo();
   }
 
   const setOrgInfo = async () => {
     await fetchOrgMembers();
-    await fetchOrgBalance();
+    // NOTE: For some reason fetchOrgBalance is called 2 twice.
+    // For now quick fix is to check if balance 
+    // has already been set to avoid calling fetchOrgbalance Twice
+    // This only happens if fetchOrgBalance is called last inside setOrgInfo.
+    if (orgBalance == undefined) await fetchOrgBalance();
   }
 
   const fetchOrgMembers = async () => {
@@ -46,9 +50,7 @@ function Organization() {
     if (getOrgBalance != undefined) setOrgBalance(getOrgBalance);
   }
 
-  useEffect(() => {
-    componentDidMount();
-  }, []);
+  useEffect(componentDidMount, []);
   
   const removeMember = async (member: Member)  => {
     const web3 = await Web3.getInstance(organization);
