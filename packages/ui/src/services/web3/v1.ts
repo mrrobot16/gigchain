@@ -72,15 +72,14 @@ export class Web3 {
     console.log('Contract mined successfully at block: ', receipt?.blockNumber);
     const deployedOrgContractAddress = deployed?.address
     const contractExplorerUrl = `https://${NETWORK}.etherscan.io/address/${deployedOrgContract?.address}`;
-
-    return {
+    const result = {
       address: deployedOrgContractAddress,
       url: contractExplorerUrl,
       deployed,
       receipt
     }
-    // window.open(contractUrl, '_blank');
-    // callback != undefined ? callback(deployedOrgContractAddress as string) : null;
+    console.log('Deployed Org Contract result: ', result);
+    return result
   }
 
   public async getOrgMembersV1() {
