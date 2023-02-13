@@ -13,6 +13,7 @@ import { Web3 } from "services/web3/v1";
 import { Member } from "types"
 import { MemberList } from "components";
 import { convertToArrayOfAddresses } from "utils";
+import { APP_URL } from "utils/constants";
 
 const formStyle = {
   display: "flex",
@@ -72,7 +73,9 @@ function CreateOrganizationForm() {
         convertToArrayOfAddresses(members),
         0.00018
       );
-      window.open(contract.url, '_blank');
+      if(APP_ENV == 'development') {
+        window.open(contract.url, '_blank');
+      }
       callbackAfterDeployOrgContract(contract.address);
     } catch (error: unknown) {
       throw new Error('Possible RPC Error: Metamask Tx Signature: User denied transaction signature');
@@ -81,7 +84,9 @@ function CreateOrganizationForm() {
 
   const callbackAfterDeployOrgContract = (address: string) => {
     // Using this way to navigate loads Members and Balances when a deployment is success.
-    window.open(`http://localhost:3000/org/${address}`)
+    // window.open(`http://localhost:3000/org/${address}`)
+    const url = `${APP_URL}/org/${address}`
+    window.open(url)
   }
 
   const onSubmit = async () => {
@@ -138,7 +143,7 @@ function CreateOrganizationForm() {
                 </div>
           </FormControl>
           <br/>
-          <Button variant="contained" color="primary" type="submit" sx={{ width: 350 }} onClick={addMember}>
+          <Button variant="contained" color="primary" sx={{ width: 350 }} onClick={addMember}>
               Add Member
           </Button>
           <br/>
