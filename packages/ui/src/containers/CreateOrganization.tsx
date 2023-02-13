@@ -1,5 +1,5 @@
 import React from "react";
-import  { Container, Box, Typography } from "@mui/material";
+import { Container, Box, Typography } from "@mui/material";
 
 import { 
   CreateOrganizationForm, 

@@ -1,11 +1,11 @@
 import { Signer, ContractFactory, ethers, BigNumber, providers } from 'ethers';
 import OrganizationABI from 'services/web3/abis/Organization.json';
 
-import { Member, Ethereum } from 'types';
+import { Member, EthereumWindowProvider } from 'types';
 
 const { REACT_APP_NETWORK: NETWORK } = process.env;
 
-const ethereum = (window).ethereum as Ethereum;
+const ethereum = (window).ethereum as EthereumWindowProvider;
 
 export class Web3 {
   private static _instance: Web3;

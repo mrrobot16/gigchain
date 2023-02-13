@@ -1,9 +1,6 @@
 import React, { 
   useEffect 
 } from "react";
-import {
-  useNavigate
-} from "react-router-dom";
 import { 
   Box, 
   Button,
@@ -11,9 +8,8 @@ import {
   FormControl,
   FormLabel,
 } from "@mui/material";
-import { AddCircle as AddCircleIcon  } from '@mui/icons-material';
 
-import { Web3 } from "services/web3";
+import { Web3 } from "services/web3/v1";
 import { Member } from "types"
 import { MemberList } from "components";
 import { convertToArrayOfAddresses } from "utils";
@@ -34,7 +30,6 @@ function CreateOrganizationForm() {
   const [name, setName] = React.useState<string>("");
   const [member, setMember ] = React.useState<Member>({ address: "0x5Db06acd673531218B10430bA6dE9b69913Ad545", amount: 0.00018 });
   const [members, setMembers] = React.useState<Member[]>([]);
-  const navigate = useNavigate();
 
   const onChangeText = (textField: string, input: string) => {
     switch (textField) {
@@ -61,14 +56,10 @@ function CreateOrganizationForm() {
   // }
 
   const addMember = () => {
-    console.log("add member");
-    console.log(member);
     setMembers([...members, member]);
   };
 
   const removeMember = (index: number) => {
-    console.log("remove member");
-    console.log(index);
     const newMembers = members.filter((item, i) => i !== index);
     setMembers(newMembers);
   };
@@ -76,22 +67,24 @@ function CreateOrganizationForm() {
   const deployOrgContract = async () => {
     try {
       const web3 = await Web3.getInstance();
-      await web3.deployOrgContract(
+      const contract = await web3.deployOrgContractV1(
         name, 
-        convertToArrayOfAddresses(members), 
-        0.00018, // this should be a constant or user input
-        callbackAfterDeployOrgContract
+        convertToArrayOfAddresses(members),
+        0.00018
       );
+      window.open(contract.url, '_blank');
+      callbackAfterDeployOrgContract(contract.address);
     } catch (error: unknown) {
       throw new Error('Possible RPC Error: Metamask Tx Signature: User denied transaction signature');
     }
   }
 
   const callbackAfterDeployOrgContract = (address: string) => {
-    navigate(`/org/${address}`);
+    // Using this way to navigate loads Members and Balances when a deployment is success.
+    window.open(`http://localhost:3000/org/${address}`)
   }
 
-  async function onSubmit() {
+  const onSubmit = async () => {
     deployOrgContract()
   }
 
@@ -124,6 +117,7 @@ function CreateOrganizationForm() {
                   onChange={(event) => onChangeText("name", event.target.value)}
                   required={true}
                   value={name}
+                  sx={{ width: 350 }}
                 />
           </FormControl>
           
@@ -132,19 +126,25 @@ function CreateOrganizationForm() {
                     Add Member
                 </FormLabel>
                 <br/>
+                <div style={{ display: "flex" }}>
                   <TextField 
                     label="Member Address" 
                     variant="outlined" 
                     onChange={(event) => onChangeText("address", event.target.value)}
                     required={true}
                     value={member.address}
+                    sx={{ width: 350 }}
                   /> 
-                <AddCircleIcon onClick={addMember}/>
+                </div>
           </FormControl>
-          
+          <br/>
+          <Button variant="contained" color="primary" type="submit" sx={{ width: 350 }} onClick={addMember}>
+              Add Member
+          </Button>
+          <br/>
           {/* Submit */}
           <FormControl>
-              <Button variant="contained" color="primary" type="submit">
+              <Button variant="contained" color="primary" type="submit" sx={{ width: 350 }}>
                 Create Organization
               </Button>
           </FormControl>  

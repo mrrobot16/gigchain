@@ -8,6 +8,7 @@
         "lerna": "yarn lerna:bootstrap",
         "lerna:bootstrap": "lerna bootstrap",
         "contracts:deploy": "cd packages/contracts && yarn deploy",
-        "contracts:test": "cd packages/contracts && yarn test"
+        "contracts:test": "cd packages/contracts && yarn test",
+        "ui": "cd packages/ui && yarn start"
     }
 }
