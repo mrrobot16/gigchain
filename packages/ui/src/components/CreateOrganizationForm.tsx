@@ -29,7 +29,7 @@ const { REACT_APP_ENVIRONMENT: APP_ENV } = process.env;
 
 function CreateOrganizationForm() {
   const [name, setName] = React.useState<string>("");
-  const [member, setMember ] = React.useState<Member>({ address: "0x5Db06acd673531218B10430bA6dE9b69913Ad545", amount: 0.00018 });
+  const [member, setMember] = React.useState<Member>({ address: "", amount: 0 });
   const [members, setMembers] = React.useState<Member[]>([]);
 
   const onChangeText = (textField: string, input: string) => {
@@ -57,7 +57,9 @@ function CreateOrganizationForm() {
   // }
 
   const addMember = () => {
-    setMembers([...members, member]);
+    if(!members.includes(member)) { 
+      setMembers([...members, member]);
+    }
   };
 
   const removeMember = (index: number) => {
@@ -156,7 +158,11 @@ function CreateOrganizationForm() {
         </Box>
       </Box>
       {/* List */}
-      <MemberList members={members} onRemoveMember={removeMember}/>
+      {
+        members.length > 0 ? (
+          <MemberList members={members} onRemoveMember={removeMember}/>
+        ) : null
+      }
     </Box>
   );
 }
