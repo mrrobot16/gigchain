@@ -5,6 +5,10 @@ export const enum ChainId {
   MATIC = "0x89",
 }
 
+export type ChainInfo = {
+  [key in ChainId]: { id: ChainId; name: string }
+}
+
 const mainnet = {
   id: ChainId.MAINNET,
   name: "Ethereum Mainnet",
@@ -25,9 +29,7 @@ const matic = {
   name: "Matic Mainnet",
 }
 
-export type ChainInfo = {
-  [key in ChainId]: { id: ChainId; name: string }
-}
+
 
 export const SUPPORTED_CHAINS = [
   ChainId.MAINNET,
