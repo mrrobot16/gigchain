@@ -1,9 +1,7 @@
 import React from "react";
 import { Container, Box, Typography } from "@mui/material";
 
-import { 
-  CreateOrganizationForm, 
- } from "components";
+import { CreateOrganizationForm } from "components";
 
 function CreateOrganization() {
   return (
@@ -13,7 +11,7 @@ function CreateOrganization() {
           Create an Organization
         </Typography>
       </Box>
-      <CreateOrganizationForm/>
+      <CreateOrganizationForm />
     </Container>
   );
 }

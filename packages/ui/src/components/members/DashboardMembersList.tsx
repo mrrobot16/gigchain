@@ -1,67 +1,82 @@
 import React from "react";
 
-import { 
+import {
   Typography,
-  List, 
-  ListItem, 
-  ListItemText, 
+  List,
+  ListItem,
+  ListItemText,
   ListItemIcon,
   TextField,
 } from "@mui/material";
-import { RemoveCircle as RemoveCircleIcon,  CurrencyBitcoin } from '@mui/icons-material';
+import {
+  RemoveCircle as RemoveCircleIcon,
+  CurrencyBitcoin,
+} from "@mui/icons-material";
 
-import { Member, Payment } from "types"
+import { Member, Payment } from "types";
 import { sanitizePayments } from "utils";
 
 interface DashboardMemberListProps {
-  members: Member[],
-  onRemoveMember: (member: Member) => void
-  onPayMember: (member: string, amount: number) => void
-  payments: Payment[],
+  members: Member[];
+  onRemoveMember: (member: Member) => void;
+  onPayMember: (member: string, amount: number) => void;
+  payments: Payment[];
   setPayments: (members: Payment[]) => void;
 }
 
-export const DashboardMemberList = ({members, onRemoveMember, onPayMember, setPayments, payments}: DashboardMemberListProps) => {
+export const DashboardMemberList = ({
+  members,
+  onRemoveMember,
+  onPayMember,
+  setPayments,
+  payments,
+}: DashboardMemberListProps) => {
   return (
     <List>
       <Typography variant="h5" align="center">
         List of Members
       </Typography>
-      {
-        members.map((member, index) => {
-          const [amount, setAmount] = React.useState(0);
+      {members.map((member, index) => {
+        const [amount, setAmount] = React.useState(0);
 
-          const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-            const value = parseInt(event.target.value);
-            setAmount(value);            
-            const sanitizedPayments  = sanitizePayments(payments, member.address, value);
-            setPayments(sanitizedPayments)
-          }
+        const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+          const value = parseInt(event.target.value);
+          setAmount(value);
+          const sanitizedPayments = sanitizePayments(
+            payments,
+            member.address,
+            value
+          );
+          setPayments(sanitizedPayments);
+        };
 
-          const onClickPayMember = () => {
-            if(amount == 0) return;
-            onPayMember(member.address, amount);
-          }
+        const onClickPayMember = () => {
+          if (amount == 0) return;
+          onPayMember(member.address, amount);
+        };
 
-          const onClickRemoveMember = () => {
-            onRemoveMember(member);
-          }
+        const onClickRemoveMember = () => {
+          onRemoveMember(member);
+        };
 
-          return (
-            <ListItem key={index}>
-              <ListItemText primary={member.address} />
-              <TextField inputProps={{ inputMode: 'numeric' }} type="number" onChange={onChange}/>
-              <ListItemIcon onClick={onClickPayMember}>
-                <CurrencyBitcoin/>
-              </ListItemIcon>
+        return (
+          <ListItem key={index}>
+            <ListItemText primary={member.address} />
+            <TextField
+              inputProps={{ inputMode: "numeric" }}
+              type="number"
+              onChange={onChange}
+            />
+            <ListItemIcon onClick={onClickPayMember}>
+              <CurrencyBitcoin />
+            </ListItemIcon>
 
-              <ListItemIcon onClick={onClickRemoveMember}>
-                <RemoveCircleIcon/>
-              </ListItemIcon>
-            </ListItem>
-          )
-        })
-      }
+            <ListItemIcon onClick={onClickRemoveMember}>
+              <RemoveCircleIcon />
+            </ListItemIcon>
+          </ListItem>
+        );
+      })}
     </List>
-  )
-}
+  );
+};

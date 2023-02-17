@@ -6,30 +6,28 @@ export const enum ChainId {
 }
 
 export type ChainInfo = {
-  [key in ChainId]: { id: ChainId; name: string }
-}
+  [key in ChainId]: { id: ChainId; name: string };
+};
 
 const mainnet = {
   id: ChainId.MAINNET,
   name: "Ethereum Mainnet",
-}
+};
 
 const goerli = {
   id: ChainId.GOERLI,
   name: "Goerli Testnet",
-}
+};
 
 const mumbai = {
   id: ChainId.MUMBAI,
   name: "Mumbai Testnet",
-}
+};
 
 const matic = {
   id: ChainId.MATIC,
   name: "Matic Mainnet",
-}
-
-
+};
 
 export const SUPPORTED_CHAINS = [
   ChainId.MAINNET,
@@ -42,5 +40,5 @@ export const CHAIN_INFO: ChainInfo = {
   [ChainId.MAINNET]: mainnet,
   [ChainId.GOERLI]: goerli,
   [ChainId.MUMBAI]: mumbai,
-  [ChainId.MATIC]: matic
-}
+  [ChainId.MATIC]: matic,
+};

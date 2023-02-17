@@ -11,6 +11,6 @@ const getUrl = (env: string | undefined) => {
     default:
       return "http://localhost:3000";
   }
-}
+};
 
 export const APP_URL = getUrl(APP_ENV);

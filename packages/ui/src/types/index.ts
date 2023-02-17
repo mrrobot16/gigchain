@@ -1,4 +1,4 @@
-import { BigNumber } from 'ethers';
+import { BigNumber } from "ethers";
 
 export interface Member {
   address: string;
@@ -15,6 +15,6 @@ export interface Payment {
 export declare interface EthereumWindowProvider {
   selectedAddress: string;
   enable(): Promise<void>;
-  request(request: { method: string, params?: Array<any> }): Promise<any>
+  request(request: { method: string; params?: Array<any> }): Promise<any>;
   chainId: string;
 }

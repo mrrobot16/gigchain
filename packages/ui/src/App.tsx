@@ -11,16 +11,14 @@ import { detectWeb3 } from "utils";
 // Except doing so will call the function more than once, which will create a bad UX.
 // Find out what other solutions are out there.
 
-detectWeb3()
+detectWeb3();
 function App() {
   return (
     <div style={appStyles}>
       <CssBaseline />
-        {/* <WagmiConfig client={client}> */}
-          <ThemeProvider theme={MUItheme}>
-            <AppRouter />
-          </ThemeProvider>
-      {/* </WagmiConfig> */}
+      <ThemeProvider theme={MUItheme}>
+        <AppRouter />
+      </ThemeProvider>
     </div>
   );
 }
